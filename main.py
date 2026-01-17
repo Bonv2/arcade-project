@@ -41,6 +41,15 @@ class GameView(arcade.View):
         self.player_list.append(self.player)
         self.all_sprites.append(self.player)
 
+        tile_map = arcade.load_tilemap("assets/alien_placeholder.tmx")
+
+        self.wall_list = tile_map.sprite_lists["walls"]
+        self.collision_list = tile_map.sprite_lists["collision"]
+
+        self.all_sprites.extend(self.wall_list)
+
+        self.camera = arcade.camera.Camera2D()
+
 
         self.physics_engine = arcade.PymunkPhysicsEngine(damping=DEFAULT_DAMPING, gravity=GRAVITY_VECTOR)
         self.physics_engine.add_sprite(
@@ -53,6 +62,11 @@ class GameView(arcade.View):
             max_horizontal_velocity=PLAYER_MAX_HOR_SPEED,
             max_vertical_velocity=PLAYER_MAX_VERT_SPEED,
         )
+        self.physics_engine.add_sprite_list(
+            self.collision_list,
+            body_type=arcade.PymunkPhysicsEngine.STATIC,
+            friction=WALL_FRICTION,
+        )
 
     def on_show(self):
         pass
@@ -60,11 +74,30 @@ class GameView(arcade.View):
     def on_draw(self):
         self.clear()
 
+        self.camera.use()
+        cam_pos = self.camera.position
+        box_player = arcade.rect.XYWH(*self.player.position, 200, 150)
+        arcade.draw_rect_outline(box_player, arcade.color.BLACK)
         self.all_sprites.draw()
 
     def on_update(self, delta_time):
         self.physics_engine.step(1 / 120)
         self.physics_engine.step(1 / 120)
+
+        box_player = arcade.rect.XYWH(*self.player.position, 200, 150)
+
+        new_x, new_y = self.camera.position
+
+        if new_x < box_player.left:
+            new_x = box_player.left
+        elif new_x > box_player.right:
+            new_x = box_player.right
+        if new_y > box_player.top:
+            new_y = box_player.top
+        elif new_y < box_player.bottom:
+            new_y = box_player.bottom
+
+        self.camera.position = (new_x, new_y)
 
         self.player.update(self.keys_pressed, delta_time)
         self.player.update_animation(delta_time)

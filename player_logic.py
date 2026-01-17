@@ -26,6 +26,8 @@ class Player(arcade.Sprite):
         self.animation_state = "idle"
         self.direction = Direction.RIGHT
 
+        self.coyote_time = 0 # time since last on ground
+
     def determine_movement(self, keys_pressed: set) -> Tuple[float, float]:
         dx, dy = 0, 0
         if arcade.key.LEFT in keys_pressed or arcade.key.A in keys_pressed:
@@ -34,7 +36,8 @@ class Player(arcade.Sprite):
             dx += self.speed
 
         if arcade.key.SPACE in keys_pressed or arcade.key.W in keys_pressed or arcade.key.UP in keys_pressed:
-            if self.view.physics_engine.is_on_ground(self) or True:
+            if self.coyote_time <= COYOTE_TIME:
+                self.coyote_time = 999
                 impulse = (0, PLAYER_JUMP_IMPULSE)
                 self.view.physics_engine.apply_impulse(self, impulse)
 
@@ -42,6 +45,12 @@ class Player(arcade.Sprite):
         return (dx, dy)
 
     def update(self, keys_pressed: set, delta_time: float = 1/60) -> None:
+        is_on_ground = self.view.physics_engine.is_on_ground(self)
+        if is_on_ground:
+            self.coyote_time = 0
+        else:
+            self.coyote_time += delta_time
+
         dx, dy = self.determine_movement(keys_pressed)
 
         if dx != 0:

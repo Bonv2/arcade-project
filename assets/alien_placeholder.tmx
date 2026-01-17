@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="32" height="20" tilewidth="64" tileheight="64" infinite="0" nextlayerid="4" nextobjectid="1">
+ <tileset firstgid="1" source="alien.tsx"/>
+ <tileset firstgid="101" source="../../../Downloads/alien.tsx"/>
+ <layer id="3" name="walls" width="32" height="20">
+  <data encoding="base64" compression="zlib">
+   eJxjYBgFo2AUjIKBAYpArDSA9jMBMeMA288KxOJYsASd7B9o/8PsVxhg+wkBUFrlZqBu3GCzX4wBezrQBmIdKtmLbD8vw8DlQZD9kjjcIEoH+0FhyoLkBm4kzI/GJ4TJTRMgN/BQiMlNFwC/NwTn
+  </data>
+ </layer>
+ <layer id="2" name="collision" width="32" height="20" visible="0">
+  <data encoding="base64" compression="zlib">
+   eJxjYBgFo2AUjIKBAYpArDSA9p+A4oG2HxuWoKP9AwWQ7VcYYPsJAUUG6scNNvvFGLCnA20g1qGSvej2D1QeRPYnuhtE6Ww/pXig3UAOAAByUTOT
+  </data>
+ </layer>
+</map>
