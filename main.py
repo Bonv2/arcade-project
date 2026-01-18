@@ -14,6 +14,9 @@ class MainMenu(arcade.View):
         self.game_title = arcade.Text(
             "Game about alien or smth", x=SCREEN_WIDTH / 2, y=SCREEN_HEIGHT / 2,
              anchor_x="center", anchor_y="center", batch = self.main_text_batch)
+        self.evil_text = arcade.Text(
+            "Press SPACE... or else...", x=SCREEN_WIDTH / 2, y=SCREEN_HEIGHT / 2.2,
+            anchor_x="center", anchor_y="center", batch=self.main_text_batch)
 
     def on_show(self):
         pass
@@ -43,6 +46,10 @@ class GameView(arcade.View):
 
         tile_map = arcade.load_tilemap("assets/alien_placeholder.tmx")
 
+        self.time = 0
+        with open("assets/stars_shader.glsl", "r", encoding="utf-8") as file:
+            self.shadertoy = arcade.experimental.Shadertoy((self.width, self.height), file.read())
+
         self.wall_list = tile_map.sprite_lists["walls"]
         self.collision_list = tile_map.sprite_lists["collision"]
 
@@ -61,6 +68,7 @@ class GameView(arcade.View):
             collision_type="player",
             max_horizontal_velocity=PLAYER_MAX_HOR_SPEED,
             max_vertical_velocity=PLAYER_MAX_VERT_SPEED,
+            elasticity=0,
         )
         self.physics_engine.add_sprite_list(
             self.collision_list,
@@ -74,30 +82,31 @@ class GameView(arcade.View):
     def on_draw(self):
         self.clear()
 
+        self.shadertoy.render(time=self.time)
+
         self.camera.use()
         cam_pos = self.camera.position
         box_player = arcade.rect.XYWH(*self.player.position, 200, 150)
-        arcade.draw_rect_outline(box_player, arcade.color.BLACK)
         self.all_sprites.draw()
+        arcade.draw_rect_outline(box_player, arcade.color.BLACK)
+        arcade.draw_point(*cam_pos, arcade.color.RED, size=2)
 
     def on_update(self, delta_time):
         self.physics_engine.step(1 / 120)
         self.physics_engine.step(1 / 120)
+        self.time += delta_time
 
         box_player = arcade.rect.XYWH(*self.player.position, 200, 150)
 
-        new_x, new_y = self.camera.position
-
-        if new_x < box_player.left:
-            new_x = box_player.left
-        elif new_x > box_player.right:
-            new_x = box_player.right
-        if new_y > box_player.top:
-            new_y = box_player.top
-        elif new_y < box_player.bottom:
-            new_y = box_player.bottom
-
-        self.camera.position = (new_x, new_y)
+        old_x, old_y = self.camera.position
+        cam_x, cam_y = self.camera.position
+        cam_x = max(min(cam_x, box_player.right), box_player.left)
+        cam_y = max(min(cam_y, box_player.top), box_player.bottom)
+        if old_x != cam_x:
+            cam_x = arcade.math.lerp(old_x, cam_x, 0.3)
+        if old_y != cam_y:
+            cam_y = arcade.math.lerp(old_y, cam_y, 0.3)
+        self.camera.position = (cam_x, cam_y)
 
         self.player.update(self.keys_pressed, delta_time)
         self.player.update_animation(delta_time)

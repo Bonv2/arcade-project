@@ -4,12 +4,12 @@
  <tileset firstgid="101" source="../../../Downloads/alien.tsx"/>
  <layer id="3" name="walls" width="32" height="20">
   <data encoding="base64" compression="zlib">
-   eJxjYBgFo2AUjIKBAYpArDSA9jMBMeMA288KxOJYsASd7B9o/8PsVxhg+wkBUFrlZqBu3GCzX4wBezrQBmIdKtmLbD8vw8DlQZD9kjjcIEoH+0FhyoLkBm4kzI/GJ4TJTRMgN/BQiMlNFwC/NwTn
+   eJxjYBgFo2AUjIKBAYpArDSA9jMBMSMR6kRpaD8rEItjwRJQNWJArE5D+4nxvy6Se2hlvwINzCfFfmJBFQP1wgKb/aD4xpYOQPbWUMleZPt5GQYuD4Ls1xpAN2gDMQsONyDneVA5xY0HCzOQnyZAbuCBYk4GRLyrIbG5kNRgwzpk2g0Acs4GsQ==
   </data>
  </layer>
- <layer id="2" name="collision" width="32" height="20" visible="0">
+ <layer id="2" name="collision" width="32" height="20">
   <data encoding="base64" compression="zlib">
-   eJxjYBgFo2AUjIKBAYpArDSA9p+A4oG2HxuWoKP9AwWQ7VcYYPsJAUUG6scNNvvFGLCnA20g1qGSvej2D1QeRPYnuhtE6Ww/pXig3UAOAAByUTOT
+   eJxjYBgFo2AUjIKBASlQPNjtp5UbUwhgBgbahhEp/qeFG9D9SW9Ajr+oGRbYzKJnOkC3g94Amz8H0v4UNDl86vDppdQN5GByAADugh2x
   </data>
  </layer>
 </map>
