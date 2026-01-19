@@ -1,5 +1,6 @@
 import arcade
 
+from math import sin, cos, atan2, degrees
 from typing import Tuple
 
 from constants import *
@@ -23,35 +24,42 @@ class Player(arcade.Sprite):
         self.animation_frame = 0
         self.animation_timer = 0
 
+        self.old_height = self.height
+
         self.animation_state = "idle"
         self.direction = Direction.RIGHT
 
         self.coyote_time = 0 # time since last on ground
 
-    def determine_movement(self, keys_pressed: set) -> Tuple[float, float]:
+    def determine_movement(self, mouse_coords: Tuple[float, float]) -> Tuple[float, float]:
         dx, dy = 0, 0
-        if arcade.key.LEFT in keys_pressed or arcade.key.A in keys_pressed:
-            dx -= self.speed
-        if arcade.key.RIGHT in keys_pressed or arcade.key.D in keys_pressed:
-            dx += self.speed
+        m_x, m_y = mouse_coords # mouse
+        p_x, p_y = self.position # player
 
-        if arcade.key.SPACE in keys_pressed or arcade.key.W in keys_pressed or arcade.key.UP in keys_pressed:
+        x = m_x - p_x
+        y = m_y - p_y
+
+        if abs(x) >= 35:
+            if x < 0:
+                dx -= self.speed
+            elif x > 0:
+                dx += self.speed
+        if y >= 90:
             if self.coyote_time <= COYOTE_TIME:
                 self.coyote_time = 999
                 impulse = (0, PLAYER_JUMP_IMPULSE)
                 self.view.physics_engine.apply_impulse(self, impulse)
 
-
         return (dx, dy)
 
-    def update(self, keys_pressed: set, delta_time: float = 1/60) -> None:
+    def update(self, mouse_coords: Tuple[float, float], delta_time: float = 1/60) -> None:
         is_on_ground = self.view.physics_engine.is_on_ground(self)
         if is_on_ground:
             self.coyote_time = 0
         else:
             self.coyote_time += delta_time
 
-        dx, dy = self.determine_movement(keys_pressed)
+        dx, dy = self.determine_movement(mouse_coords)
 
         if dx != 0:
             self.animation_state = "walk"

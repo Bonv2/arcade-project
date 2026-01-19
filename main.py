@@ -41,20 +41,21 @@ class GameView(arcade.View):
         self.all_sprites = arcade.SpriteList()
 
         self.player: Player | None = Player(self)
-        self.player.center_x = self.width / 2
+        self.player.center_x = self.width
         self.player.center_y = self.height / 2
         self.player_list = arcade.SpriteList()
         self.player_list.append(self.player)
         self.all_sprites.append(self.player)
 
-        tile_map = arcade.load_tilemap("assets/alien_placeholder.tmx")
+        tile_map = arcade.load_tilemap("assets/race.tmx")
 
         self.time = 0
         with open("assets/shaders/stars_shader.glsl", "r", encoding="utf-8") as file:
             self.stars_shader = arcade.experimental.Shadertoy((self.width, self.height), file.read())
 
         self.wall_list = tile_map.sprite_lists["walls"]
-        self.collision_list = tile_map.sprite_lists["collision"]
+        self.background_list = tile_map.sprite_lists["background"]
+        self.collision_list = tile_map.sprite_lists["walls"]
 
         self.all_sprites.extend(self.wall_list)
 
@@ -94,6 +95,7 @@ class GameView(arcade.View):
         self.world_camera.use()
         cam_pos = self.world_camera.position
         box_player = arcade.rect.XYWH(*self.player.position, 200, 150)
+        self.background_list.draw()
         self.all_sprites.draw()
         mouse = self.world_to_cam(self.mouse_pos)
         arcade.draw_line(*self.player.position, *mouse, arcade.color.PUCE)
@@ -120,7 +122,7 @@ class GameView(arcade.View):
 
         self.update_world_camera()
 
-        self.player.update(self.keys_pressed, delta_time)
+        self.player.update(self.world_to_cam(self.mouse_pos), delta_time)
         self.player.update_animation(delta_time)
 
     def on_key_press(self, symbol, modifiers):
