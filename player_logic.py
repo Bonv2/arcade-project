@@ -29,7 +29,7 @@ class Player(arcade.Sprite):
         self.coyote_time = 0 # time since last on ground
 
     def determine_movement(self, keys_pressed: set) -> Tuple[float, float]:
-        dx, dy = 0, 1
+        dx, dy = 0, 0
         if arcade.key.LEFT in keys_pressed or arcade.key.A in keys_pressed:
             dx -= self.speed
         if arcade.key.RIGHT in keys_pressed or arcade.key.D in keys_pressed:

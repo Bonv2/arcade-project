@@ -1,5 +1,8 @@
+import math
+
 import arcade
 from pyglet.graphics import Batch
+from typing import Tuple
 
 from constants import *
 from player_logic import Player
@@ -47,15 +50,16 @@ class GameView(arcade.View):
         tile_map = arcade.load_tilemap("assets/alien_placeholder.tmx")
 
         self.time = 0
-        with open("assets/stars_shader.glsl", "r", encoding="utf-8") as file:
-            self.shadertoy = arcade.experimental.Shadertoy((self.width, self.height), file.read())
+        with open("assets/shaders/stars_shader.glsl", "r", encoding="utf-8") as file:
+            self.stars_shader = arcade.experimental.Shadertoy((self.width, self.height), file.read())
 
         self.wall_list = tile_map.sprite_lists["walls"]
         self.collision_list = tile_map.sprite_lists["collision"]
 
         self.all_sprites.extend(self.wall_list)
 
-        self.world_camera = arcade.camera.Camera2D(window=self.window)
+        self.world_camera = arcade.camera.Camera2D()
+        self.mouse_pos = (0, 0)
 
         self.physics_engine = arcade.PymunkPhysicsEngine(damping=DEFAULT_DAMPING, gravity=GRAVITY_VECTOR)
         self.physics_engine.add_sprite(
@@ -78,23 +82,25 @@ class GameView(arcade.View):
     def on_show(self):
         pass
 
+    def on_resize(self, width: int, height: int) -> bool | None:
+        self.world_camera.update_values(arcade.rect.XYWH(self.width/2, self.height/2, self.width, self.height))
+        self.stars_shader.resize((self.width, self.height))
+
     def on_draw(self):
         self.clear()
 
-        self.shadertoy.render(time=self.time)
+        self.stars_shader.render(time=self.time)
 
         self.world_camera.use()
         cam_pos = self.world_camera.position
         box_player = arcade.rect.XYWH(*self.player.position, 200, 150)
         self.all_sprites.draw()
+        mouse = self.world_to_cam(self.mouse_pos)
+        arcade.draw_line(*self.player.position, *mouse, arcade.color.PUCE)
         arcade.draw_rect_outline(box_player, arcade.color.BLACK)
         arcade.draw_point(*cam_pos, arcade.color.RED, size=2)
 
-    def on_update(self, delta_time):
-        self.physics_engine.step(1 / 120)
-        self.physics_engine.step(1 / 120)
-        self.time += delta_time
-
+    def update_world_camera(self):
         box_player = arcade.rect.XYWH(*self.player.position, 200, 150)
 
         old_x, old_y = self.world_camera.position
@@ -107,20 +113,48 @@ class GameView(arcade.View):
             cam_y = arcade.math.lerp(old_y, cam_y, 0.3)
         self.world_camera.position = (cam_x, cam_y)
 
+    def on_update(self, delta_time):
+        self.physics_engine.step(1 / 120)
+        self.physics_engine.step(1 / 120)
+        self.time += delta_time
+
+        self.update_world_camera()
+
         self.player.update(self.keys_pressed, delta_time)
         self.player.update_animation(delta_time)
 
     def on_key_press(self, symbol, modifiers):
-        if symbol not in self.keys_pressed:
+        if symbol == arcade.key.F11:
+            self.window.set_fullscreen(not self.window.fullscreen)
+        elif symbol == arcade.key.ESCAPE:
+            self.window.set_fullscreen(False)
+        elif symbol not in self.keys_pressed:
             self.keys_pressed.add(symbol)
 
     def on_key_release(self, symbol, modifiers):
         if symbol in self.keys_pressed:
             self.keys_pressed.remove(symbol)
 
+    def on_mouse_motion(self, x: int, y: int, dx: int, dy: int) -> bool | None:
+        self.mouse_pos = (x, y)
+
+    def on_mouse_press(self, x: int, y: int, button: int, modifiers: int) -> bool | None:
+        if button == arcade.MOUSE_BUTTON_LEFT:
+            player = self.player.position
+            target = self.world_to_cam(self.mouse_pos)
+            vector = target - player
+            angle = math.atan2(vector.y, vector.x)
+            x, y = math.cos(angle), math.sin(angle)
+
+    def world_to_cam(self, xy: Tuple[float, float]) -> Tuple[float, float]:
+        x, y = xy
+        return (x + self.world_camera.position[0] - self.width / 2,
+                y + self.world_camera.position[1] - self.height / 2)
+
 
 def main():
-    game = arcade.Window(SCREEN_WIDTH, SCREEN_HEIGHT, "Alien game")
+    game = arcade.Window(SCREEN_WIDTH, SCREEN_HEIGHT, "Alien game", resizable=True)
+    game.set_minimum_size(1, 2)
     arcade.set_background_color(arcade.color.SPACE_CADET)
     game.show_view(MainMenu())
     arcade.run()
