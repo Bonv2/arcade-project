@@ -55,8 +55,7 @@ class GameView(arcade.View):
 
         self.all_sprites.extend(self.wall_list)
 
-        self.camera = arcade.camera.Camera2D()
-
+        self.world_camera = arcade.camera.Camera2D(window=self.window)
 
         self.physics_engine = arcade.PymunkPhysicsEngine(damping=DEFAULT_DAMPING, gravity=GRAVITY_VECTOR)
         self.physics_engine.add_sprite(
@@ -84,8 +83,8 @@ class GameView(arcade.View):
 
         self.shadertoy.render(time=self.time)
 
-        self.camera.use()
-        cam_pos = self.camera.position
+        self.world_camera.use()
+        cam_pos = self.world_camera.position
         box_player = arcade.rect.XYWH(*self.player.position, 200, 150)
         self.all_sprites.draw()
         arcade.draw_rect_outline(box_player, arcade.color.BLACK)
@@ -98,15 +97,15 @@ class GameView(arcade.View):
 
         box_player = arcade.rect.XYWH(*self.player.position, 200, 150)
 
-        old_x, old_y = self.camera.position
-        cam_x, cam_y = self.camera.position
+        old_x, old_y = self.world_camera.position
+        cam_x, cam_y = self.world_camera.position
         cam_x = max(min(cam_x, box_player.right), box_player.left)
         cam_y = max(min(cam_y, box_player.top), box_player.bottom)
         if old_x != cam_x:
             cam_x = arcade.math.lerp(old_x, cam_x, 0.3)
         if old_y != cam_y:
             cam_y = arcade.math.lerp(old_y, cam_y, 0.3)
-        self.camera.position = (cam_x, cam_y)
+        self.world_camera.position = (cam_x, cam_y)
 
         self.player.update(self.keys_pressed, delta_time)
         self.player.update_animation(delta_time)
