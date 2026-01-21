@@ -1,11 +1,10 @@
-import math
-
 import arcade
 from pyglet.graphics import Batch
 from typing import Tuple
 
 from constants import *
 from player_logic import Player
+from objects import Checkpoint, RaceEnd
 
 SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 600
@@ -34,7 +33,7 @@ class MainMenu(arcade.View):
 
 
 class GameView(arcade.View):
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
         self.keys_pressed = set()
 
@@ -47,19 +46,38 @@ class GameView(arcade.View):
         self.player_list.append(self.player)
         self.all_sprites.append(self.player)
 
-        tile_map = arcade.load_tilemap("assets/race.tmx")
-
         self.time = 0
         with open("assets/shaders/stars_shader.glsl", "r", encoding="utf-8") as file:
-            self.stars_shader = arcade.experimental.Shadertoy((self.width, self.height), file.read())
+            self.stars_shader = arcade.experimental.Shadertoy((int(self.width), int(self.height)), file.read())
+
+        tile_map = arcade.load_tilemap("assets/race.tmx")
 
         self.wall_list = tile_map.sprite_lists["walls"]
         self.background_list = tile_map.sprite_lists["background"]
-        self.collision_list = tile_map.sprite_lists["walls"]
+        self.collision_list = tile_map.sprite_lists["walls"] # fixme: make some actual collisions, this will fix randomly getting stuck in ground
+        self.checkpoints = arcade.SpriteList(use_spatial_hash=True)
+        self.ends = arcade.SpriteList(use_spatial_hash=True)
+
+        self.cur_race: int | None = None
+        self.cur_race_timer: float = 0
+
+        self.cur_checkpoint: Checkpoint | None = None
+
+        checkpoints = tile_map.sprite_lists["checkpoints"]
+        for checkpoint in checkpoints:
+            pos = checkpoint.position
+            self.checkpoints.append(Checkpoint(pos))
+
+        ends = tile_map.sprite_lists["ends"]
+        for end in ends:
+            pos = end.position
+            race = end.properties["race_number"]
+            rtype = end.properties["type"]
+            self.ends.append(RaceEnd(pos, rtype, race))
 
         self.all_sprites.extend(self.wall_list)
 
-        self.world_camera = arcade.camera.Camera2D()
+        self.world_camera = arcade.camera.Camera2D( )
         self.mouse_pos = (0, 0)
 
         self.physics_engine = arcade.PymunkPhysicsEngine(damping=DEFAULT_DAMPING, gravity=GRAVITY_VECTOR)
@@ -85,18 +103,24 @@ class GameView(arcade.View):
 
     def on_resize(self, width: int, height: int) -> bool | None:
         self.world_camera.update_values(arcade.rect.XYWH(self.width/2, self.height/2, self.width, self.height))
-        self.stars_shader.resize((self.width, self.height))
+        self.stars_shader.resize((int(self.width), int(self.height)))
 
-    def on_draw(self):
+    def on_draw(self) -> bool | None:
         self.clear()
 
         self.stars_shader.render(time=self.time)
 
         self.world_camera.use()
+        self.background_list.draw()
+        self.checkpoints.draw()
+        for checkpoint in self.checkpoints:
+            checkpoint.draw()
+        self.all_sprites.draw()
+        self.player.draw()
+        self.ends.draw()
+
         cam_pos = self.world_camera.position
         box_player = arcade.rect.XYWH(*self.player.position, 200, 150)
-        self.background_list.draw()
-        self.all_sprites.draw()
         mouse = self.world_to_cam(self.mouse_pos)
         arcade.draw_line(*self.player.position, *mouse, arcade.color.PUCE)
         arcade.draw_rect_outline(box_player, arcade.color.BLACK)
@@ -110,10 +134,21 @@ class GameView(arcade.View):
         cam_x = max(min(cam_x, box_player.right), box_player.left)
         cam_y = max(min(cam_y, box_player.top), box_player.bottom)
         if old_x != cam_x:
-            cam_x = arcade.math.lerp(old_x, cam_x, 0.3)
+            cam_x = arcade.math.lerp(old_x, cam_x, 0.22)
         if old_y != cam_y:
-            cam_y = arcade.math.lerp(old_y, cam_y, 0.3)
+            cam_y = arcade.math.lerp(old_y, cam_y, 0.22)
         self.world_camera.position = (cam_x, cam_y)
+
+    def update_non_phys_collisions(self):
+        checkpoints_collisions = arcade.check_for_collision_with_list(self.player, self.checkpoints)
+        checkpoint: Checkpoint
+        for checkpoint in checkpoints_collisions:
+            if not checkpoint.active:
+                checkpoint.activate()
+                self.cur_checkpoint = checkpoint
+                for ccheckpoint in self.checkpoints:
+                    if ccheckpoint != self.cur_checkpoint:
+                        ccheckpoint.deactivate()
 
     def on_update(self, delta_time):
         self.physics_engine.step(1 / 120)
@@ -121,8 +156,12 @@ class GameView(arcade.View):
         self.time += delta_time
 
         self.update_world_camera()
+        self.update_non_phys_collisions()
 
-        self.player.update(self.world_to_cam(self.mouse_pos), delta_time)
+        self.checkpoints.update(delta_time)
+        self.ends.update(delta_time)
+
+        self.player.update(self.world_to_cam(self.mouse_pos), self.keys_pressed, delta_time)
         self.player.update_animation(delta_time)
 
     def on_key_press(self, symbol, modifiers):
@@ -141,17 +180,16 @@ class GameView(arcade.View):
         self.mouse_pos = (x, y)
 
     def on_mouse_press(self, x: int, y: int, button: int, modifiers: int) -> bool | None:
-        if button == arcade.MOUSE_BUTTON_LEFT:
-            player = self.player.position
-            target = self.world_to_cam(self.mouse_pos)
-            vector = target - player
-            angle = math.atan2(vector.y, vector.x)
-            x, y = math.cos(angle), math.sin(angle)
+        pass
 
     def world_to_cam(self, xy: Tuple[float, float]) -> Tuple[float, float]:
         x, y = xy
         return (x + self.world_camera.position[0] - self.width / 2,
                 y + self.world_camera.position[1] - self.height / 2)
+
+    def get_cur_checkpoint(self) -> Checkpoint | None:
+        return self.cur_checkpoint # maybe store some checkpoints
+        # and get the one furthest along path or smth
 
 
 def main():

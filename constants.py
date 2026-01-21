@@ -1,4 +1,6 @@
 import enum
+import arcade.texture
+
 
 class Direction(enum.Enum):
     UP = 0
@@ -6,10 +8,26 @@ class Direction(enum.Enum):
     LEFT = 2
     RIGHT = 3
 
+
+class EndTypes(enum.Enum):
+    START = 0
+    INTERMEDIATE = 1 # this will probably be unused
+    END = 2
+    UNKNOWN = 3
+
+
 PLAYER_TEXTURE = "./assets/alien_placeholder.png"
 PLAYER_SCALE = 0.33
 COYOTE_TIME = 0.12
 ANIMATION_FPS = 10
+TIME_TILL_TP = 0.5
+
+TP_PARTICLE = arcade.load_spritesheet("assets/tileset.png").get_texture(
+    arcade.rect.LBWH(576, 448, 64, 64),
+    y_up=True,
+)
+CHECKPOINT_PARTICLE = arcade.texture.make_soft_circle_texture(8, arcade.color.ELECTRIC_CYAN)
+JUMP_PARTICLE = arcade.texture.make_circle_texture(9, arcade.color.GAINSBORO)
 
 ##############################
 # Physics engine stuff below #
