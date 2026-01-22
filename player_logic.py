@@ -40,7 +40,7 @@ def make_jump_particles(x, y):
 
 def make_tp_particles(x, y):
     return Emitter(center_xy=(x, y),
-        emit_controller=EmitBurst(16),
+        emit_controller=EmitBurst(20),
         particle_factory=lambda e: FadeParticle(
             filename_or_texture=TP_PARTICLE,
             change_xy=arcade.math.rand_in_circle((0, 0), 2),

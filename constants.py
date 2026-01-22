@@ -15,6 +15,10 @@ class EndTypes(enum.Enum):
     END = 2
     UNKNOWN = 3
 
+DEBUG_INFO = False
+
+SCREEN_WIDTH = 800
+SCREEN_HEIGHT = 600
 
 PLAYER_TEXTURE = "./assets/alien_placeholder.png"
 PLAYER_SCALE = 0.33

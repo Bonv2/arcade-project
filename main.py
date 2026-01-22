@@ -1,4 +1,6 @@
 import arcade
+import random
+import math
 from pyglet.graphics import Batch
 from typing import Tuple
 
@@ -6,8 +8,6 @@ from constants import *
 from player_logic import Player
 from objects import Checkpoint, RaceEnd
 
-SCREEN_WIDTH = 800
-SCREEN_HEIGHT = 600
 
 class MainMenu(arcade.View):
     def __init__(self):
@@ -40,8 +40,8 @@ class GameView(arcade.View):
         self.all_sprites = arcade.SpriteList()
 
         self.player: Player | None = Player(self)
-        self.player.center_x = self.width
-        self.player.center_y = self.height / 2
+        self.player.center_x = 768
+        self.player.center_y = 320
         self.player_list = arcade.SpriteList()
         self.player_list.append(self.player)
         self.all_sprites.append(self.player)
@@ -77,8 +77,37 @@ class GameView(arcade.View):
 
         self.all_sprites.extend(self.wall_list)
 
-        self.world_camera = arcade.camera.Camera2D( )
+        self.world_camera = arcade.camera.Camera2D()
+        self.ui_camera = arcade.camera.Camera2D()
+        pos1 = self.ui_camera.position
         self.mouse_pos = (0, 0)
+
+        self.ui_list = arcade.SpriteList()
+
+        self.windup = 0
+        self.visual_timer = 0
+        self.timer_batch = Batch()
+        self.timer_font = arcade.load_font("assets/Seven Segment.ttf")
+        self.timer_text_bckgrnd0 = arcade.Text(f"0:00:00",
+                                               x=100, y=60,
+                                               anchor_x="center", anchor_y="center", batch=self.timer_batch,
+                                               color=(0, 0, 0, 64), font_name="Seven Segment",
+                                               font_size=42)
+        self.timer_text = arcade.Text(f"0:00:00",
+                                      x=100, y=60,
+                                      anchor_x="center", anchor_y="center", batch=self.timer_batch,
+                                      color=arcade.color.BLACK, font_name="Seven Segment",
+                                      font_size=42)
+        self.corner_textures = [arcade.load_texture(f"assets/timer_corner/timer_corner{i}.png") for i in range(6)]
+        self.corner = arcade.Sprite("assets/timer_corner/timer_corner0.png")
+        self.ui_list.append(self.corner)
+        self.corner.scale = 0.7
+        self.corner.left = 0
+        self.corner.bottom = 0
+        self.corner.visible = False
+        self.timer_text_bckgrnd0.visible = False
+        self.timer_text.visible = False
+        self.corner_update()
 
         self.physics_engine = arcade.PymunkPhysicsEngine(damping=DEFAULT_DAMPING, gravity=GRAVITY_VECTOR)
         self.physics_engine.add_sprite(
@@ -98,11 +127,30 @@ class GameView(arcade.View):
             friction=WALL_FRICTION,
         )
 
+    def corner_update(self):
+        ok = min((self.visual_timer ** 0.5) * 0.5, 1)
+        x, y = self.world_to_cam((100, 60), self.ui_camera)
+        x1, y1 = self.world_to_cam((0, 0), self.ui_camera)
+        self.timer_text_bckgrnd0.x = x + random.uniform(-10, 10) * ok
+        self.timer_text_bckgrnd0.y = y + random.uniform(-10, 10) * ok
+        self.timer_text.x = x
+        self.timer_text.y = y
+        self.corner.left = x1
+        self.corner.bottom = y1
+        m = int(self.cur_race_timer // 60)
+        s = str(math.floor(self.cur_race_timer % 60)).rjust(2, "0")
+        ms = str(self.cur_race_timer - math.floor(self.cur_race_timer))[2:4]
+        self.timer_text_bckgrnd0.text = f"{m}:{s}:{ms}"
+        self.timer_text.text = f"{m}:{s}:{ms}"
+        frame = int(self.visual_timer * 15  * ok) % 6
+        self.corner.texture = self.corner_textures[frame]
+
     def on_show(self):
         pass
 
     def on_resize(self, width: int, height: int) -> bool | None:
-        self.world_camera.update_values(arcade.rect.XYWH(self.width/2, self.height/2, self.width, self.height))
+        self.world_camera.match_window(viewport=True, projection=True)
+        self.ui_camera.match_window(viewport=True, projection=True)
         self.stars_shader.resize((int(self.width), int(self.height)))
 
     def on_draw(self) -> bool | None:
@@ -119,12 +167,19 @@ class GameView(arcade.View):
         self.player.draw()
         self.ends.draw()
 
-        cam_pos = self.world_camera.position
-        box_player = arcade.rect.XYWH(*self.player.position, 200, 150)
-        mouse = self.world_to_cam(self.mouse_pos)
-        arcade.draw_line(*self.player.position, *mouse, arcade.color.PUCE)
-        arcade.draw_rect_outline(box_player, arcade.color.BLACK)
-        arcade.draw_point(*cam_pos, arcade.color.RED, size=2)
+        if DEBUG_INFO:
+            cam_pos = self.world_camera.position
+            arcade.draw_text(f"{self.cur_race_timer:0.2f} {self.cur_race}", x=cam_pos[0] - self.width / 2, y=cam_pos[1],
+                             anchor_x="left", anchor_y="center")
+            box_player = arcade.rect.XYWH(*self.player.position, 200, 150)
+            mouse = self.world_to_cam(self.mouse_pos)
+            arcade.draw_line(*self.player.position, *mouse, arcade.color.PUCE)
+            arcade.draw_rect_outline(box_player, arcade.color.BLACK)
+            arcade.draw_point(*cam_pos, arcade.color.RED, size=2)
+
+        self.ui_camera.use()
+        self.ui_list.draw()
+        self.timer_batch.draw()
 
     def update_world_camera(self):
         box_player = arcade.rect.XYWH(*self.player.position, 200, 150)
@@ -150,6 +205,16 @@ class GameView(arcade.View):
                     if ccheckpoint != self.cur_checkpoint:
                         ccheckpoint.deactivate()
 
+        ends_collisions = arcade.check_for_collision_with_list(self.player, self.ends)
+        node: RaceEnd
+        for node in ends_collisions:
+            type, race_id = node.get_action()
+            if type == EndTypes.START and self.cur_race is None:
+                self.cur_race = race_id
+                self.cur_race_timer = 0
+            elif type == EndTypes.END and self.cur_race == race_id:
+                self.cur_race = None
+
     def on_update(self, delta_time):
         self.physics_engine.step(1 / 120)
         self.physics_engine.step(1 / 120)
@@ -161,7 +226,25 @@ class GameView(arcade.View):
         self.checkpoints.update(delta_time)
         self.ends.update(delta_time)
 
-        self.player.update(self.world_to_cam(self.mouse_pos), self.keys_pressed, delta_time)
+        self.visual_timer += delta_time * self.windup
+        if self.cur_race is not None:
+            self.cur_race_timer += delta_time
+            self.windup += delta_time
+            self.windup = min(1, self.windup)
+        else:
+            self.windup -= delta_time
+            self.windup = max(0, self.windup)
+        if self.windup != 0:
+            self.corner.visible = True
+            self.timer_text_bckgrnd0.visible = True
+            self.timer_text.visible = True
+            self.corner_update()
+        else:
+            self.corner.visible = False
+            self.timer_text_bckgrnd0.visible = False
+            self.timer_text.visible = False
+
+        self.player.update(self.world_to_cam(self.mouse_pos, self.world_camera), self.keys_pressed, delta_time)
         self.player.update_animation(delta_time)
 
     def on_key_press(self, symbol, modifiers):
@@ -182,10 +265,10 @@ class GameView(arcade.View):
     def on_mouse_press(self, x: int, y: int, button: int, modifiers: int) -> bool | None:
         pass
 
-    def world_to_cam(self, xy: Tuple[float, float]) -> Tuple[float, float]:
+    def world_to_cam(self, xy: Tuple[float, float], camera: arcade.Camera2D) -> Tuple[float, float]:
         x, y = xy
-        return (x + self.world_camera.position[0] - self.width / 2,
-                y + self.world_camera.position[1] - self.height / 2)
+        return (x + camera.position[0] - self.width / 2,
+                y + camera.position[1] - self.height / 2)
 
     def get_cur_checkpoint(self) -> Checkpoint | None:
         return self.cur_checkpoint # maybe store some checkpoints
