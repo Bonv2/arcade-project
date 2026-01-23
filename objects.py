@@ -3,6 +3,7 @@ import arcade
 import math
 from typing import Tuple
 from arcade.particles import (FadeParticle, Emitter, EmitBurst, EmitInterval, EmitMaintainCount)
+from pyglet.graphics import Batch
 from constants import *
 
 
@@ -27,24 +28,36 @@ def make_checkpoint_particles(x: float | int, y: float | int) -> Emitter:
         ),)
 
 
-class Checkpoint(arcade.Sprite):
-    def __init__(self, pos) -> None:
+class Respawn(arcade.Sprite):
+    def __init__(self, pos: Tuple[float, float]) -> None:
         super().__init__()
         self.position = pos
+        self.reset_timer = True
+        self.active: bool = False
+
+    def activate(self) -> None:
+        self.active = True
+
+    def deactivate(self) -> None:
+        self.active = False
+
+
+class Checkpoint(Respawn):
+    def __init__(self, pos: Tuple[float, float]) -> None:
+        super().__init__(pos)
         texture = arcade.load_spritesheet("assets/tileset.png")
         rect = arcade.rect.LBWH(576, 320, 64, 64)
         texture = texture.get_texture(rect, y_up=True)
         self.texture = texture
-
-        self.active: bool = False
+        self.reset_timer = False
         self.emitter: Emitter | None = None
 
     def activate(self) -> None:
-        self.active = True
+        super().activate()
         self.emitter = make_checkpoint_particles(*self.position)
 
     def deactivate(self) -> None:
-        self.active = False
+        super().deactivate()
         self.emitter = None
 
     def draw(self) -> None:
@@ -57,7 +70,7 @@ class Checkpoint(arcade.Sprite):
 
 
 class RaceEnd(arcade.Sprite):
-    def __init__(self, pos, type: EndTypes = EndTypes.UNKNOWN, race: int = -1) -> None:
+    def __init__(self, pos: Tuple[float, float], type: EndTypes = EndTypes.UNKNOWN, race: int = -1) -> None:
         super().__init__()
         self.position = pos
         self.time = (math.pi if (self.center_y // 64) % 2 == 1 else 0)
@@ -81,3 +94,74 @@ class RaceEnd(arcade.Sprite):
     def update(self, delta_time: float = 1/60) -> None:
         self.time += delta_time * 2
         self.color = (255, 255, 255, 128 + int(((math.sin(self.time) + 1) / 2) * 128))
+
+
+class TimerDisplay(arcade.Sprite):
+    def __init__(self, pos: Tuple[float, float], size: Tuple[float, float], race_id: int) -> None:
+        super().__init__()
+        self.position = pos
+        self.race_id = race_id
+        self.width = size[0]
+        self.height = size[1]
+        self.visual_time = 0
+        self.best_time = math.inf
+        self.do_blinking = False
+        self.batch = Batch()
+        self.digits = []
+        arcade.load_font("assets/Seven Segment.ttf")
+        self.text_color = arcade.color.WHITE
+        left_bottom = (self.center_x - self.width / 2, self.center_y - self.height / 2)
+        self.info_text = arcade.Text(f"",
+                                           x=left_bottom[0], y=left_bottom[1] + 60,
+                                           anchor_x="left", anchor_y="bottom",
+                                           color=self.text_color, font_size=25,
+                                           font_name="Seven Segment", batch=self.batch)
+        self.setup()
+
+    def setup(self) -> None:
+        strin = self.time_string()
+        print(strin)
+        step = self.width / len(strin)
+        left_bottom = (self.center_x - self.width / 2, self.center_y - self.height / 2)
+        for i, digit in enumerate(strin):
+            self.digits.append(arcade.Text(f"{digit}",
+                                           x=left_bottom[0] + step * i, y=left_bottom[1],
+                                           anchor_x="left", anchor_y="bottom",
+                                           color=self.text_color, font_size=40,
+                                           font_name="Seven Segment", batch=self.batch))
+
+    def set_time(self, time: float) -> None:
+        if time < self.best_time:
+            self.best_time = time
+            self.info_text.text = "new best!"
+            self.do_blinking = True
+        else:
+            self.info_text.text = f"best: {self.time_string(self.best_time)}"
+            self.do_blinking = False
+        strin = self.time_string(time)
+        for i, digit in enumerate(self.digits):
+            digit.text = strin[i]
+
+    def time_string(self, time: float = 0) -> str:
+        m = str(int(time // 60)).rjust(2, "0")
+        s = str(math.floor(time % 60)).rjust(2, "0")
+        ms = str(time - math.floor(time))[2:4].rjust(2, "0")
+        return f"{m}:{s}:{ms}"
+
+    def update_color(self, color) -> None:
+        for digit in self.digits:
+            digit.color = color
+
+    def update(self, delta_time: float = 1/60) -> None:
+        self.visual_time += delta_time
+        if self.do_blinking:
+            color = (255, 255, 255, int((math.sin(self.visual_time * 3) + 1) / 2 * 255))
+            self.update_color(color)
+        else:
+            self.update_color(arcade.color.WHITE)
+
+
+    def draw(self) -> None:
+        rect = arcade.rect.XYWH(*self.position, self.width, self.height)
+        arcade.draw_rect_filled(rect, arcade.color.BLACK)
+        self.batch.draw()

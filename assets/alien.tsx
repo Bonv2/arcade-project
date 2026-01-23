@@ -6,6 +6,11 @@
    <object id="2" x="0" y="0.909091" width="64" height="63.0909"/>
   </objectgroup>
  </tile>
+ <tile id="99">
+  <objectgroup draworder="index" id="2">
+   <object id="1" x="0" y="0" width="64" height="64"/>
+  </objectgroup>
+ </tile>
  <wangsets>
   <wangset name="Безымянный набор" type="mixed" tile="-1">
    <wangcolor name="" color="#ff0000" tile="-1" probability="1"/>

@@ -6,7 +6,7 @@ from typing import Tuple
 
 from constants import *
 from player_logic import Player
-from objects import Checkpoint, RaceEnd
+from objects import Checkpoint, RaceEnd, Respawn, TimerDisplay
 
 
 class MainMenu(arcade.View):
@@ -41,7 +41,7 @@ class GameView(arcade.View):
 
         self.player: Player | None = Player(self)
         self.player.center_x = 768
-        self.player.center_y = 320
+        self.player.center_y = 900
         self.player_list = arcade.SpriteList()
         self.player_list.append(self.player)
         self.all_sprites.append(self.player)
@@ -54,32 +54,42 @@ class GameView(arcade.View):
 
         self.wall_list = tile_map.sprite_lists["walls"]
         self.background_list = tile_map.sprite_lists["background"]
-        self.collision_list = tile_map.sprite_lists["walls"] # fixme: make some actual collisions, this will fix randomly getting stuck in ground
-        self.checkpoints = arcade.SpriteList(use_spatial_hash=True)
-        self.ends = arcade.SpriteList(use_spatial_hash=True)
+        self.collision_list = tile_map.sprite_lists["collisions"] # fixme: pymunk just makes every collision a cube, fix by adding SHAPES to the pymunk SPACE manually
+        self.laser_list = tile_map.sprite_lists["lasers"]
+        self.checkpoint_list = arcade.SpriteList(use_spatial_hash=True)
+        self.end_list = arcade.SpriteList(use_spatial_hash=True)
+        self.display_list = arcade.SpriteList()
 
         self.cur_race: int | None = None
         self.cur_race_timer: float = 0
 
         self.cur_checkpoint: Checkpoint | None = None
 
+        displays = tile_map.sprite_lists["displays"]
+        for display in displays:
+            pos = display.position
+            size = (display.width, display.height)
+            race_id = display.properties["race_id"]
+            self.display_list.append(TimerDisplay(pos, size, race_id))
+
+
         checkpoints = tile_map.sprite_lists["checkpoints"]
         for checkpoint in checkpoints:
             pos = checkpoint.position
-            self.checkpoints.append(Checkpoint(pos))
+            self.checkpoint_list.append(Checkpoint(pos))
 
         ends = tile_map.sprite_lists["ends"]
         for end in ends:
             pos = end.position
-            race = end.properties["race_number"]
+            race = end.properties["race_id"]
             rtype = end.properties["type"]
-            self.ends.append(RaceEnd(pos, rtype, race))
+            self.end_list.append(RaceEnd(pos, rtype, race))
 
+        self.all_sprites.extend(self.laser_list)
         self.all_sprites.extend(self.wall_list)
 
         self.world_camera = arcade.camera.Camera2D()
         self.ui_camera = arcade.camera.Camera2D()
-        pos1 = self.ui_camera.position
         self.mouse_pos = (0, 0)
 
         self.ui_list = arcade.SpriteList()
@@ -87,7 +97,7 @@ class GameView(arcade.View):
         self.windup = 0
         self.visual_timer = 0
         self.timer_batch = Batch()
-        self.timer_font = arcade.load_font("assets/Seven Segment.ttf")
+        arcade.load_font("assets/Seven Segment.ttf")
         self.timer_text_bckgrnd0 = arcade.Text(f"0:00:00",
                                                x=100, y=60,
                                                anchor_x="center", anchor_y="center", batch=self.timer_batch,
@@ -124,8 +134,21 @@ class GameView(arcade.View):
         self.physics_engine.add_sprite_list(
             self.collision_list,
             body_type=arcade.PymunkPhysicsEngine.STATIC,
+            collision_type="wall",
             friction=WALL_FRICTION,
         )
+        self.physics_engine.add_sprite_list(
+            self.laser_list,
+            body_type=arcade.PymunkPhysicsEngine.STATIC,
+            collision_type="laser",
+        )
+        self.physics_engine.add_collision_handler(
+            "player",  "laser", pre_handler=self.respawn_player,
+        )
+
+    def respawn_player(self, *args):
+        self.player.respawn_at_chkpnt()
+        return True
 
     def corner_update(self):
         ok = min((self.visual_timer ** 0.5) * 0.5, 1)
@@ -160,12 +183,16 @@ class GameView(arcade.View):
 
         self.world_camera.use()
         self.background_list.draw()
-        self.checkpoints.draw()
-        for checkpoint in self.checkpoints:
+        for display in self.display_list:
+            display.draw()
+        self.checkpoint_list.draw()
+        for checkpoint in self.checkpoint_list:
             checkpoint.draw()
         self.all_sprites.draw()
         self.player.draw()
-        self.ends.draw()
+        self.end_list.draw()
+        self.collision_list.draw()
+        self.collision_list.draw_hit_boxes(arcade.color.WHITE)
 
         if DEBUG_INFO:
             cam_pos = self.world_camera.position
@@ -194,28 +221,42 @@ class GameView(arcade.View):
             cam_y = arcade.math.lerp(old_y, cam_y, 0.22)
         self.world_camera.position = (cam_x, cam_y)
 
-    def update_non_phys_collisions(self):
-        checkpoints_collisions = arcade.check_for_collision_with_list(self.player, self.checkpoints)
+    def update_non_phys_collisions(self): # all that uses collision but not physics
+        checkpoints_collisions = arcade.check_for_collision_with_list(self.player, self.checkpoint_list)
         checkpoint: Checkpoint
         for checkpoint in checkpoints_collisions:
             if not checkpoint.active:
                 checkpoint.activate()
                 self.cur_checkpoint = checkpoint
-                for ccheckpoint in self.checkpoints:
+                for ccheckpoint in self.checkpoint_list:
                     if ccheckpoint != self.cur_checkpoint:
                         ccheckpoint.deactivate()
 
-        ends_collisions = arcade.check_for_collision_with_list(self.player, self.ends)
+        ends_collisions = arcade.check_for_collision_with_list(self.player, self.end_list)
         node: RaceEnd
         for node in ends_collisions:
             type, race_id = node.get_action()
             if type == EndTypes.START and self.cur_race is None:
                 self.cur_race = race_id
+                self.cur_checkpoint = Respawn(node.position)
+                for checkpoint in self.checkpoint_list:
+                    checkpoint.deactivate()
                 self.cur_race_timer = 0
             elif type == EndTypes.END and self.cur_race == race_id:
+                self.flush_display_time(self.cur_race_timer, self.cur_race)
+                self.unique_race_triggers(self.cur_race)
                 self.cur_race = None
 
-    def on_update(self, delta_time):
+    def unique_race_triggers(self, race_id: int):  # this is for handling triggers upon race completion (not used)
+        pass
+
+    def flush_display_time(self, cur_race_timer: float, cur_race: int):
+        display: TimerDisplay
+        for display in self.display_list:
+            if display.race_id == cur_race:
+                display.set_time(cur_race_timer)
+
+    def on_update(self, delta_time: float = 1/60):
         self.physics_engine.step(1 / 120)
         self.physics_engine.step(1 / 120)
         self.time += delta_time
@@ -223,8 +264,9 @@ class GameView(arcade.View):
         self.update_world_camera()
         self.update_non_phys_collisions()
 
-        self.checkpoints.update(delta_time)
-        self.ends.update(delta_time)
+        self.display_list.update(delta_time)
+        self.checkpoint_list.update(delta_time)
+        self.end_list.update(delta_time)
 
         self.visual_timer += delta_time * self.windup
         if self.cur_race is not None:
@@ -273,6 +315,7 @@ class GameView(arcade.View):
     def get_cur_checkpoint(self) -> Checkpoint | None:
         return self.cur_checkpoint # maybe store some checkpoints
         # and get the one furthest along path or smth
+        # upd: why tho
 
 
 def main():

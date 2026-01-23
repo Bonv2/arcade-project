@@ -1,51 +1,71 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="50" height="36" tilewidth="64" tileheight="64" infinite="0" nextlayerid="5" nextobjectid="17">
+<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="50" height="36" tilewidth="64" tileheight="64" infinite="0" nextlayerid="8" nextobjectid="54">
  <tileset firstgid="1" source="alien.tsx"/>
- <tileset firstgid="101" source="../../../Downloads/alien.tsx"/>
  <layer id="2" name="background" width="50" height="36">
   <data encoding="base64" compression="zlib">
-   eJztld0SgiAQRvepHK/sx5u0vCnK1+tRYye3gBEJBcFmz8x3QZTuyU8FYBiGYRiGYRiGsdMM2RqNZ3KEZqtkdo7sQXfJyZUchEzxXj/HgntX0F2qBPPawHlOMO2gurSgu+eCrwdeE+yYGL6fbnId9KC+uHpl20s4/gfqOrrcZmTpeUPml2cVJdTzOYYH3h8HmaMjNXzv86XE8jjLXBzpInn49GHqnebyKCN7UB/qYV0YazWFsW7B7lHCuteDzt8pn91l+hEPM1Mea/dK9TD3QnuUkT3U/9/sjk+v8DgPR/pIHnPfXRgx8zj0u5AeKZOzx5r8i8fWeAG0madT
+   eJztlt0OgyAMhXkq4tX+vJls3mxuvt4edSWhGWmQSiYCSU9yogTRflgKSolEIpFIJBKJRCLRsgbn1jQkukZhbAfwkfFJ8SylOJFhAmvwGXwh7l3fQ/1YOO69ZWO6ujjh/vOC65t4dn32GeONqSn3KEfM+E/sfE8VcmC+xFgYzio4kOW5oXPEyNWXNbUKnWuuU2t/yHZ9hOpUqG6ZCuP3OW7gO+MxE0dKPsT2NI6jy8yB+dC7tiZt35q0jVrm6NS+/wO/P3ox2X1sDnBQxzi4vNpyrS9xrHUqR5eZw59/mjspeRU6j4TOJzk4/tm7/HNFyntw3JYcJV2CgxvXklqMuSZ9AZOcj50=
   </data>
  </layer>
+ <objectgroup id="5" name="displays">
+  <object id="17" gid="76" x="2688" y="1408" width="320" height="192">
+   <properties>
+    <property name="race_id" type="int" value="0"/>
+   </properties>
+  </object>
+ </objectgroup>
  <objectgroup id="3" name="checkpoints">
-  <object id="2" gid="150" x="704" y="2048" width="64" height="64"/>
-  <object id="4" gid="150" x="2624" y="1472" width="64" height="64"/>
+  <object id="2" gid="50" x="704" y="2048" width="64" height="64"/>
+  <object id="4" gid="50" x="2624" y="1472" width="64" height="64"/>
  </objectgroup>
  <objectgroup id="4" name="ends">
-  <object id="11" gid="40" x="1600" y="1920" width="64" height="64">
-   <properties>
-    <property name="race_number" type="int" value="0"/>
-    <property name="type" value="start"/>
-   </properties>
-  </object>
   <object id="13" gid="40" x="1600" y="1984" width="64" height="64">
    <properties>
-    <property name="race_number" type="int" value="0"/>
+    <property name="race_id" type="int" value="0"/>
     <property name="type" value="start"/>
-   </properties>
-  </object>
-  <object id="14" gid="40" x="2496" y="1408" width="64" height="64">
-   <properties>
-    <property name="race_number" type="int" value="0"/>
-    <property name="type" value="end"/>
    </properties>
   </object>
   <object id="15" gid="40" x="2496" y="1472" width="64" height="64">
    <properties>
-    <property name="race_number" type="int" value="0"/>
+    <property name="race_id" type="int" value="0"/>
     <property name="type" value="end"/>
    </properties>
   </object>
-  <object id="16" gid="40" x="2496" y="1344" width="64" height="64">
+  <object id="18" gid="40" x="2496" y="1344" width="64" height="64">
    <properties>
-    <property name="race_number" type="int" value="0"/>
+    <property name="race_id" type="int" value="0"/>
     <property name="type" value="end"/>
+   </properties>
+  </object>
+  <object id="19" gid="40" x="2496" y="1408" width="64" height="64">
+   <properties>
+    <property name="race_id" type="int" value="0"/>
+    <property name="type" value="end"/>
+   </properties>
+  </object>
+  <object id="20" gid="40" x="1600" y="1920" width="64" height="64">
+   <properties>
+    <property name="race_id" type="int" value="0"/>
+    <property name="type" value="start"/>
    </properties>
   </object>
  </objectgroup>
- <layer id="1" name="walls" width="50" height="36">
+ <layer id="6" name="lasers" width="50" height="36">
   <data encoding="base64" compression="zlib">
-   eJztl0kOgzAMRcOw63CHsqQ9Fvc/Q8MiamQRGg8Et/pP+hJCwfYXxhYhAAAAAAAAAMD/sTDlEW5t+XlPXiU5Pb4XqQ9veKxJwkKut3r8F7ye1euPqIuhJmZ+q/ncR82G6rL6OF60JB9D1FWpMXx8cOqz9NGR+zWx6ZneKI6Eo33U0NrHt/n5jHrt5Cp9s958bHF2X9E8kr1Q+4w3H+su4u6PFF9L8nEL+h14J3Fa/oNY78FcLVlnjHb/lQTKvAE/0DF7
+   eJztzzEOABAUREF3QqlWu/9lKBxBfJGZZPu3KQEAAADwkrxW9mpwC9zQogMO6dEBh/zyY0QHADxsAnxlAe0=
   </data>
  </layer>
+ <layer id="1" name="walls" width="50" height="36">
+  <data encoding="base64" compression="zlib">
+   eJztl8sKwjAQRcfqxlcRxBcoxi4EH+Detf//TWbQQClpZpKmaQtz4C6KaTq3TeZGAEEQBEEQBEEQYnHRmjtUVMYVljn6QKZ1d2gJv/rz//WomzKdHLRmWguGJtBPH+jh5TH+obXSmmrtarSPXCOHc6J72iakplv0KprTx3cbQtnHFuxrXKUsKJATdLMvqbzy1dvz+fjNjlDfq7g9i8orX5kcUB5eYuwp42MMvNyiMq2cZ4pZQ0wfMfI0s8yjGPcNwQeH1D6wJ7jOpXjGeDp+N324umdT+/iAu04bG8aYVD5Mbw7pqVege2YqH7hesB9R34Jad3XE9GH+1zRRbplnDXTG+ZzzKR9tCDPJdz+FYtZMG0rlYYh8AcScGHc=
+  </data>
+ </layer>
+ <objectgroup id="7" name="collisions">
+  <object id="47" gid="100" x="832" y="2112" width="64" height="64"/>
+  <object id="48" gid="100" x="576" y="2112" width="128" height="64"/>
+  <object id="49" gid="100" x="640" y="2112" width="64" height="64"/>
+  <object id="50" gid="100" x="704" y="2112" width="64" height="64"/>
+  <object id="51" gid="100" x="768" y="2112" width="64" height="64"/>
+  <object id="52" gid="100" x="896" y="2112" width="64" height="64"/>
+  <object id="53" gid="100" x="960" y="2112" width="64" height="64"/>
+ </objectgroup>
 </map>

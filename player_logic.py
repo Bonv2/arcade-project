@@ -159,6 +159,8 @@ class Player(arcade.Sprite):
         checkpoint = self.view.get_cur_checkpoint()
         if checkpoint is None:
             return
+        if checkpoint.reset_timer:
+            self.view.cur_race_timer = 0
         x, y = checkpoint.position
         y += 10
         self.emitters.append(make_tp_particles(*self.position))
