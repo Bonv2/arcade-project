@@ -43,7 +43,7 @@ class GameView(arcade.View):
 
         self.player: Player | None = Player(self)
         self.player.center_x = 768
-        self.player.center_y = 900
+        self.player.center_y = 340
         self.player_list = arcade.SpriteList()
         self.player_list.append(self.player)
         self.all_sprites.append(self.player)
@@ -145,8 +145,10 @@ class GameView(arcade.View):
             object = self.physics_engine.get_physics_object(wall)
             body = object.body
             old_shape = object.shape
+            ffriction = old_shape.friction
             shape = pymunk.Poly(body, [(-width, -height), (-width, height),
                                        (width, height), (width, -height)])
+            shape.friction = ffriction
             self.physics_engine.space.remove(old_shape)
             self.physics_engine.space.add(shape)
 
@@ -204,11 +206,10 @@ class GameView(arcade.View):
         self.all_sprites.draw()
         self.player.draw()
         self.end_list.draw()
-        self.collision_list.draw()
-        self.collision_list.draw_hit_boxes(arcade.color.WHITE)
 
         if DEBUG_INFO:
             cam_pos = self.world_camera.position
+            self.collision_list.draw()
             arcade.draw_text(f"{self.cur_race_timer:0.2f} {self.cur_race}", x=cam_pos[0] - self.width / 2, y=cam_pos[1],
                              anchor_x="left", anchor_y="center")
             box_player = arcade.rect.XYWH(*self.player.position, 200, 150)
