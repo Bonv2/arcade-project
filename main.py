@@ -1,6 +1,8 @@
 import arcade
 import random
 import math
+
+import pymunk
 from pyglet.graphics import Batch
 from typing import Tuple
 
@@ -54,7 +56,7 @@ class GameView(arcade.View):
 
         self.wall_list = tile_map.sprite_lists["walls"]
         self.background_list = tile_map.sprite_lists["background"]
-        self.collision_list = tile_map.sprite_lists["collisions"] # fixme: pymunk just makes every collision a cube, fix by adding SHAPES to the pymunk SPACE manually
+        self.collision_list = tile_map.sprite_lists["collisions"]
         self.laser_list = tile_map.sprite_lists["lasers"]
         self.checkpoint_list = arcade.SpriteList(use_spatial_hash=True)
         self.end_list = arcade.SpriteList(use_spatial_hash=True)
@@ -137,6 +139,17 @@ class GameView(arcade.View):
             collision_type="wall",
             friction=WALL_FRICTION,
         )
+
+        for wall in self.collision_list:  # fix for weird collision
+            width, height = wall.width / 2, wall.height / 2
+            object = self.physics_engine.get_physics_object(wall)
+            body = object.body
+            old_shape = object.shape
+            shape = pymunk.Poly(body, [(-width, -height), (-width, height),
+                                       (width, height), (width, -height)])
+            self.physics_engine.space.remove(old_shape)
+            self.physics_engine.space.add(shape)
+
         self.physics_engine.add_sprite_list(
             self.laser_list,
             body_type=arcade.PymunkPhysicsEngine.STATIC,
