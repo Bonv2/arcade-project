@@ -26,7 +26,7 @@ COYOTE_TIME = 0.12
 ANIMATION_FPS = 10
 TIME_TILL_TP = 0.5
 
-TP_PARTICLE = arcade.load_spritesheet("assets/tileset.png").get_texture(
+TP_PARTICLE = arcade.load_spritesheet("assets/levels/tileset.png").get_texture(
     arcade.rect.LBWH(576, 448, 64, 64),
     y_up=True,
 )

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="50" height="36" tilewidth="64" tileheight="64" infinite="0" nextlayerid="8" nextobjectid="81">
+<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="50" height="36" tilewidth="64" tileheight="64" infinite="0" nextlayerid="9" nextobjectid="86">
  <tileset firstgid="1" source="alien.tsx"/>
  <layer id="2" name="background" width="50" height="36">
   <data encoding="base64" compression="zlib">
@@ -49,6 +49,18 @@
    </properties>
   </object>
  </objectgroup>
+ <objectgroup id="8" name="platforms">
+  <object id="85" gid="32" x="3136" y="1536" width="128" height="64">
+   <properties>
+    <property name="boundary_bottom" type="float" value="0"/>
+    <property name="boundary_left" type="float" value="-1"/>
+    <property name="boundary_right" type="float" value="7"/>
+    <property name="boundary_top" type="float" value="0"/>
+    <property name="change_x" type="float" value="1"/>
+    <property name="change_y" type="float" value="0"/>
+   </properties>
+  </object>
+ </objectgroup>
  <layer id="6" name="lasers" width="50" height="36">
   <data encoding="base64" compression="zlib">
    eJztzzEOABAUREF3QqlWu/9lKBxBfJGZZPu3KQEAAADwkrxW9mpwC9zQogMO6dEBh/zyY0QHADxsAnxlAe0=
@@ -59,7 +71,7 @@
    eJztl8sKwjAQRcfqxlcRxBcoxi4EH+Detf//TWbQQClpZpKmaQtz4C6KaTq3TeZGAEEQBEEQBEEQYnHRmjtUVMYVljn6QKZ1d2gJv/rz//WomzKdHLRmWguGJtBPH+jh5TH+obXSmmrtarSPXCOHc6J72iakplv0KprTx3cbQtnHFuxrXKUsKJATdLMvqbzy1dvz+fjNjlDfq7g9i8orX5kcUB5eYuwp42MMvNyiMq2cZ4pZQ0wfMfI0s8yjGPcNwQeH1D6wJ7jOpXjGeDp+N324umdT+/iAu04bG8aYVD5Mbw7pqVege2YqH7hesB9R34Jad3XE9GH+1zRRbplnDXTG+ZzzKR9tCDPJdz+FYtZMG0rlYYh8AcScGHc=
   </data>
  </layer>
- <objectgroup id="7" name="collisions">
+ <objectgroup id="7" name="collisions" opacity="0.52">
   <object id="48" gid="100" x="448" y="2176" width="1152" height="128"/>
   <object id="54" gid="100" x="448" y="2048" width="128" height="512"/>
   <object id="55" gid="100" x="576" y="1664" width="1024" height="128"/>
@@ -68,7 +80,7 @@
   <object id="58" gid="100" x="960" y="2048" width="192" height="128"/>
   <object id="59" gid="100" x="1088" y="1920" width="128" height="128"/>
   <object id="60" gid="100" x="1728" y="2176" width="896" height="128"/>
-  <object id="61" gid="100" x="2496" y="2048" width="640" height="576"/>
+  <object id="61" gid="100" x="2432" y="1536" width="704" height="64"/>
   <object id="63" gid="100" x="1728" y="1152" width="64" height="64"/>
   <object id="64" gid="100" x="1728" y="1088" width="768" height="192"/>
   <object id="67" gid="100" x="2432" y="1152" width="64" height="64"/>
@@ -84,6 +96,6 @@
   <object id="77" gid="100" x="1856" y="1408" width="256" height="64"/>
   <object id="78" gid="100" x="2240" y="1408" width="64" height="64"/>
   <object id="79" gid="100" x="2112" y="1856" width="192" height="64"/>
-  <object id="80" gid="100" x="2432" y="1536" width="128" height="64"/>
+  <object id="80" gid="100" x="2496" y="2048" width="640" height="512"/>
  </objectgroup>
 </map>

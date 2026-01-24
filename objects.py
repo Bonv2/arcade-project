@@ -1,8 +1,8 @@
 import random
 import arcade
 import math
-from typing import Tuple
-from arcade.particles import (FadeParticle, Emitter, EmitBurst, EmitInterval, EmitMaintainCount)
+from typing import Tuple, Dict
+from arcade.particles import (FadeParticle, Emitter, EmitInterval)
 from pyglet.graphics import Batch
 from constants import *
 
@@ -45,7 +45,7 @@ class Respawn(arcade.Sprite):
 class Checkpoint(Respawn):
     def __init__(self, pos: Tuple[float, float]) -> None:
         super().__init__(pos)
-        texture = arcade.load_spritesheet("assets/tileset.png")
+        texture = arcade.load_spritesheet("assets/levels/tileset.png")
         rect = arcade.rect.LBWH(576, 320, 64, 64)
         texture = texture.get_texture(rect, y_up=True)
         self.texture = texture
@@ -54,6 +54,8 @@ class Checkpoint(Respawn):
 
     def activate(self) -> None:
         super().activate()
+        sound = arcade.load_sound("assets/sounds/activate_checkpoint.wav")
+        sound.play(loop=False, volume=0.5)
         self.emitter = make_checkpoint_particles(*self.position)
 
     def deactivate(self) -> None:
@@ -74,7 +76,7 @@ class RaceEnd(arcade.Sprite):
         super().__init__()
         self.position = pos
         self.time = (math.pi if (self.center_y // 64) % 2 == 1 else 0)
-        texture = arcade.load_spritesheet("assets/tileset.png")
+        texture = arcade.load_spritesheet("assets/levels/tileset.png")
         rect = arcade.rect.LBWH(576, 384, 64, 64)
         texture = texture.get_texture(rect, y_up=True)
         self.texture = texture
@@ -97,8 +99,9 @@ class RaceEnd(arcade.Sprite):
 
 
 class TimerDisplay(arcade.Sprite):
-    def __init__(self, pos: Tuple[float, float], size: Tuple[float, float], race_id: int) -> None:
+    def __init__(self, pos: Tuple[float, float], size: Tuple[float, float], race_id: int, level: str) -> None:
         super().__init__()
+        self.level = level
         self.position = pos
         self.race_id = race_id
         self.width = size[0]
@@ -120,7 +123,6 @@ class TimerDisplay(arcade.Sprite):
 
     def setup(self) -> None:
         strin = self.time_string()
-        print(strin)
         step = self.width / len(strin)
         left_bottom = (self.center_x - self.width / 2, self.center_y - self.height / 2)
         for i, digit in enumerate(strin):
@@ -129,11 +131,14 @@ class TimerDisplay(arcade.Sprite):
                                            anchor_x="left", anchor_y="bottom",
                                            color=self.text_color, font_size=40,
                                            font_name="Seven Segment", batch=self.batch))
+        time = self.get_saved_race_time(self.race_id)
+        self.load_best_time(time)
 
     def set_time(self, time: float) -> None:
         if time < self.best_time:
             self.best_time = time
             self.info_text.text = "new best!"
+            self.save_best_time()
             self.do_blinking = True
         else:
             self.info_text.text = f"best: {self.time_string(self.best_time)}"
@@ -141,6 +146,35 @@ class TimerDisplay(arcade.Sprite):
         strin = self.time_string(time)
         for i, digit in enumerate(self.digits):
             digit.text = strin[i]
+
+    def save_best_time(self) -> None:
+        ok = self.get_best_times_dict()
+        ok[self.race_id] = self.best_time
+        ok = [f"{i};{ok[i]}\n" for i in ok.keys()]
+        print("writing")
+        with open(f"assets/saved/{self.level}.txt", "w") as file:
+            for line in ok:
+                file.write(line)
+
+    def get_best_times_dict(self) -> Dict[int, float]:
+        try:
+            with open(f"assets/saved/{self.level}.txt", "r") as file:
+                ok = [i.rstrip("\n").split(";") for i in file.readlines()]
+                ok = [(int(i[0]), float(i[1])) for i in ok]
+                ok = dict(ok)
+        except FileNotFoundError:
+            return {}
+        return ok
+
+    def get_saved_race_time(self, race_id: int) -> float | None:
+        ok = self.get_best_times_dict()
+        return ok.get(race_id, None)
+
+    def load_best_time(self, time: float | None) -> None:
+        if time is None:
+            return
+        self.best_time = time
+        self.info_text.text = f"best: {self.time_string(time)}"
 
     def time_string(self, time: float = 0) -> str:
         m = str(int(time // 60)).rjust(2, "0")

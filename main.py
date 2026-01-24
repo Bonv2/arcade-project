@@ -4,7 +4,7 @@ import math
 
 import pymunk
 from pyglet.graphics import Batch
-from typing import Tuple
+from typing import Tuple, Dict
 
 from constants import *
 from player_logic import Player
@@ -52,13 +52,15 @@ class GameView(arcade.View):
         with open("assets/shaders/stars_shader.glsl", "r", encoding="utf-8") as file:
             self.stars_shader = arcade.experimental.Shadertoy((int(self.width), int(self.height)), file.read())
 
-        tile_map = arcade.load_tilemap("assets/race.tmx")
+        self.level = "race"
+        tile_map = arcade.load_tilemap(f"assets/levels/{self.level}.tmx")
 
         self.wall_list = tile_map.sprite_lists["walls"]
         self.background_list = tile_map.sprite_lists["background"]
         self.collision_list = tile_map.sprite_lists["collisions"]
         self.laser_list = tile_map.sprite_lists["lasers"]
         self.checkpoint_list = arcade.SpriteList(use_spatial_hash=True)
+        self.platform_list = tile_map.sprite_lists["platforms"]
         self.end_list = arcade.SpriteList(use_spatial_hash=True)
         self.display_list = arcade.SpriteList()
 
@@ -66,14 +68,19 @@ class GameView(arcade.View):
         self.cur_race_timer: float = 0
 
         self.cur_checkpoint: Checkpoint | None = None
+        for platform in self.platform_list:
+            x, y = platform.position
+            platform.boundary_left = x + platform.boundary_left * 64
+            platform.boundary_top = y + platform.boundary_top * 64
+            platform.boundary_right = x + platform.boundary_right * 64
+            platform.boundary_bottom = y + platform.boundary_bottom * 64
 
         displays = tile_map.sprite_lists["displays"]
         for display in displays:
             pos = display.position
             size = (display.width, display.height)
             race_id = display.properties["race_id"]
-            self.display_list.append(TimerDisplay(pos, size, race_id))
-
+            self.display_list.append(TimerDisplay(pos, size, race_id, self.level))
 
         checkpoints = tile_map.sprite_lists["checkpoints"]
         for checkpoint in checkpoints:
@@ -139,8 +146,26 @@ class GameView(arcade.View):
             collision_type="wall",
             friction=WALL_FRICTION,
         )
+        self.physics_engine.add_sprite_list(
+            self.platform_list,
+            body_type=arcade.PymunkPhysicsEngine.KINEMATIC,
+            collision_type="wall",
+            friction=1.0,
+        )
 
         for wall in self.collision_list:  # fix for weird collision
+            width, height = wall.width / 2, wall.height / 2
+            object = self.physics_engine.get_physics_object(wall)
+            body = object.body
+            old_shape = object.shape
+            ffriction = old_shape.friction
+            shape = pymunk.Poly(body, [(-width, -height), (-width, height),
+                                       (width, height), (width, -height)])
+            shape.friction = ffriction
+            self.physics_engine.space.remove(old_shape)
+            self.physics_engine.space.add(shape)
+
+        for wall in self.platform_list:  # fix for weird collision
             width, height = wall.width / 2, wall.height / 2
             object = self.physics_engine.get_physics_object(wall)
             body = object.body
@@ -203,6 +228,7 @@ class GameView(arcade.View):
         self.checkpoint_list.draw()
         for checkpoint in self.checkpoint_list:
             checkpoint.draw()
+        self.platform_list.draw()
         self.all_sprites.draw()
         self.player.draw()
         self.end_list.draw()
@@ -214,7 +240,7 @@ class GameView(arcade.View):
                              anchor_x="left", anchor_y="center")
             box_player = arcade.rect.XYWH(*self.player.position, 200, 150)
             mouse = self.world_to_cam(self.mouse_pos)
-            arcade.draw_line(*self.player.position, *mouse, arcade.color.PUCE)
+            arcade.draw_line(*self.player.position , *mouse, arcade.color.PUCE)
             arcade.draw_rect_outline(box_player, arcade.color.BLACK)
             arcade.draw_point(*cam_pos, arcade.color.RED, size=2)
 
@@ -235,7 +261,7 @@ class GameView(arcade.View):
             cam_y = arcade.math.lerp(old_y, cam_y, 0.22)
         self.world_camera.position = (cam_x, cam_y)
 
-    def update_non_phys_collisions(self): # all that uses collision but not physics
+    def update_non_phys_collisions(self): # all that uses collision but not physics, todo: maybe use pymunk sensors somehow (that should improve performance if i will need it)
         checkpoints_collisions = arcade.check_for_collision_with_list(self.player, self.checkpoint_list)
         checkpoint: Checkpoint
         for checkpoint in checkpoints_collisions:
@@ -253,6 +279,8 @@ class GameView(arcade.View):
             if type == EndTypes.START and self.cur_race is None:
                 self.cur_race = race_id
                 self.cur_checkpoint = Respawn(node.position)
+                sound = arcade.Sound("assets/sounds/race_start.wav")
+                sound.play(loop=False, volume=0.5)
                 for checkpoint in self.checkpoint_list:
                     checkpoint.deactivate()
                 self.cur_race_timer = 0
@@ -270,9 +298,28 @@ class GameView(arcade.View):
             if display.race_id == cur_race:
                 display.set_time(cur_race_timer)
 
+    def update_platforms(self, delta_time: float = 1/60):
+        for platform in self.platform_list:
+            if platform.change_x > 0 and \
+                    platform.right >= platform.boundary_right:
+                platform.change_x *= -1
+            elif platform.change_x < 0 and \
+                    platform.left <= platform.boundary_left:
+                platform.change_x *= -1
+            if platform.change_y > 0 and \
+                    platform.top >= platform.boundary_top:
+                platform.change_y *= -1
+            elif platform.change_y < 0 and \
+                    platform.bottom <= platform.boundary_bottom:
+                platform.change_y *= -1
+            velocity = (platform.change_x * 1 / delta_time, platform.change_y * 1 / delta_time)
+            self.physics_engine.set_velocity(platform, velocity)
+
     def on_update(self, delta_time: float = 1/60):
         self.physics_engine.step(1 / 120)
+        self.update_platforms(1 / 120)
         self.physics_engine.step(1 / 120)
+        self.update_platforms(1 / 120)
         self.time += delta_time
 
         self.update_world_camera()
@@ -319,7 +366,13 @@ class GameView(arcade.View):
         self.mouse_pos = (x, y)
 
     def on_mouse_press(self, x: int, y: int, button: int, modifiers: int) -> bool | None:
-        pass
+        if button == arcade.MOUSE_BUTTON_RIGHT:
+            self.keys_pressed.add(arcade.key.R)
+
+    def on_mouse_release(self, x: int, y: int, button: int, modifiers: int) -> bool | None:
+        if button == arcade.MOUSE_BUTTON_RIGHT:
+            if arcade.key.R in self.keys_pressed:
+                self.keys_pressed.remove(arcade.key.R)
 
     def world_to_cam(self, xy: Tuple[float, float], camera: arcade.Camera2D) -> Tuple[float, float]:
         x, y = xy

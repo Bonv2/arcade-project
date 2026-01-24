@@ -1,6 +1,5 @@
 import arcade
 import random
-import math
 from arcade.particles import (FadeParticle, Emitter, EmitBurst)
 from typing import Tuple, List
 
@@ -95,6 +94,8 @@ class Player(arcade.Sprite):
                 dx += self.speed
         if y >= 90:
             if self.coyote_time <= COYOTE_TIME:
+                sound = arcade.Sound("assets/sounds/jump.wav")
+                sound.play(loop=False, volume=0.5)
                 self.coyote_time = 999
                 impulse = (0, PLAYER_JUMP_IMPULSE)
                 self.emitters.append(make_jump_particles(self.center_x, self.bottom + 3))
@@ -161,6 +162,8 @@ class Player(arcade.Sprite):
             return
         if checkpoint.reset_timer:
             self.view.cur_race_timer = 0
+        sound = arcade.Sound("assets/sounds/teleport.wav")
+        sound.play(loop=False, volume=0.5)
         x, y = checkpoint.position
         y += 10
         self.emitters.append(make_tp_particles(*self.position))
