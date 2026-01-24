@@ -4,7 +4,7 @@ import math
 
 import pymunk
 from pyglet.graphics import Batch
-from typing import Tuple, Dict
+from typing import Tuple
 
 from constants import *
 from player_logic import Player
@@ -31,29 +31,51 @@ class MainMenu(arcade.View):
 
     def on_key_press(self, symbol, modifiers):
         if symbol == arcade.key.SPACE:
-            self.window.show_view(GameView())
+            game_view = GameView()
+            game_view.setup(level="race")
+            self.window.show_view(game_view)
+        elif symbol == arcade.key.F11:
+            self.window.set_fullscreen(not self.window.fullscreen)
+        elif symbol == arcade.key.ESCAPE:
+            self.window.set_fullscreen(False)
 
 
 class GameView(arcade.View):
     def __init__(self) -> None:
         super().__init__()
         self.keys_pressed = set()
+        self.level: str | None = None
+        self.time = 0
+        with open("assets/shaders/stars_shader.glsl", "r", encoding="utf-8") as file:
+            self.stars_shader = arcade.experimental.Shadertoy((int(self.width), int(self.height)), file.read())
+        self.world_camera = arcade.camera.Camera2D()
+        self.ui_camera = arcade.camera.Camera2D()
 
+    def setup(self, level: str) -> None:
         self.all_sprites = arcade.SpriteList()
 
+        self.level = level
+        tile_map = arcade.load_tilemap(f"assets/levels/{self.level}.tmx")
+
+        self.special_list = tile_map.sprite_lists["special"]
+        self.level_end_list = arcade.SpriteList(use_spatial_hash=True)
+
         self.player: Player | None = Player(self)
-        self.player.center_x = 768
-        self.player.center_y = 340
+        for special in self.special_list:
+            type = special.properties["type"]
+            if type == "player_spawn":
+                print(special.bottom, special.center_x)
+                self.player.bottom = special.bottom
+                self.player.center_x = special.center_x
+            if type == "level_end":
+                special.send_to = special.properties["send_to"]
+                special.properties = None
+                self.level_end_list.append(special)
+
         self.player_list = arcade.SpriteList()
         self.player_list.append(self.player)
         self.all_sprites.append(self.player)
 
-        self.time = 0
-        with open("assets/shaders/stars_shader.glsl", "r", encoding="utf-8") as file:
-            self.stars_shader = arcade.experimental.Shadertoy((int(self.width), int(self.height)), file.read())
-
-        self.level = "race"
-        tile_map = arcade.load_tilemap(f"assets/levels/{self.level}.tmx")
 
         self.wall_list = tile_map.sprite_lists["walls"]
         self.background_list = tile_map.sprite_lists["background"]
@@ -97,8 +119,6 @@ class GameView(arcade.View):
         self.all_sprites.extend(self.laser_list)
         self.all_sprites.extend(self.wall_list)
 
-        self.world_camera = arcade.camera.Camera2D()
-        self.ui_camera = arcade.camera.Camera2D()
         self.mouse_pos = (0, 0)
 
         self.ui_list = arcade.SpriteList()
@@ -162,6 +182,7 @@ class GameView(arcade.View):
             shape = pymunk.Poly(body, [(-width, -height), (-width, height),
                                        (width, height), (width, -height)])
             shape.friction = ffriction
+            shape.collision_type = self.physics_engine.collision_types.index("wall")
             self.physics_engine.space.remove(old_shape)
             self.physics_engine.space.add(shape)
 
@@ -174,6 +195,7 @@ class GameView(arcade.View):
             shape = pymunk.Poly(body, [(-width, -height), (-width, height),
                                        (width, height), (width, -height)])
             shape.friction = ffriction
+            shape.collision_type = self.physics_engine.collision_types.index("wall")
             self.physics_engine.space.remove(old_shape)
             self.physics_engine.space.add(shape)
 
@@ -183,12 +205,12 @@ class GameView(arcade.View):
             collision_type="laser",
         )
         self.physics_engine.add_collision_handler(
-            "player",  "laser", pre_handler=self.respawn_player,
+            "player", "laser", pre_handler=self.respawn_player,
         )
 
     def respawn_player(self, *args):
         self.player.respawn_at_chkpnt()
-        return True
+        return False
 
     def corner_update(self):
         ok = min((self.visual_timer ** 0.5) * 0.5, 1)
@@ -222,16 +244,19 @@ class GameView(arcade.View):
         self.stars_shader.render(time=self.time)
 
         self.world_camera.use()
-        self.background_list.draw()
-        for display in self.display_list:
-            display.draw()
-        self.checkpoint_list.draw()
-        for checkpoint in self.checkpoint_list:
-            checkpoint.draw()
-        self.platform_list.draw()
-        self.all_sprites.draw()
-        self.player.draw()
-        self.end_list.draw()
+        if self.level is not None:
+            self.background_list.draw()
+            for display in self.display_list:
+                display.draw()
+            self.checkpoint_list.draw()
+            for checkpoint in self.checkpoint_list:
+                checkpoint.draw()
+            self.platform_list.draw()
+            self.all_sprites.draw()
+            self.player.draw()
+            self.end_list.draw()
+        else:
+            arcade.draw_text("No level loaded!", self.width // 2, self.height // 2,)
 
         if DEBUG_INFO:
             cam_pos = self.world_camera.position
@@ -245,8 +270,9 @@ class GameView(arcade.View):
             arcade.draw_point(*cam_pos, arcade.color.RED, size=2)
 
         self.ui_camera.use()
-        self.ui_list.draw()
-        self.timer_batch.draw()
+        if self.level is not None:
+            self.ui_list.draw()
+            self.timer_batch.draw()
 
     def update_world_camera(self):
         box_player = arcade.rect.XYWH(*self.player.position, 200, 150)
@@ -289,6 +315,15 @@ class GameView(arcade.View):
                 self.unique_race_triggers(self.cur_race)
                 self.cur_race = None
 
+        level_end_collision = arcade.check_for_collision_with_list(self.player, self.level_end_list)
+        if level_end_collision:
+            level_end = level_end_collision[0]
+            if level_end.send_to == "menu":
+                self.window.show_view(main_menu)
+                self.level = None
+            else:
+                self.setup(level_end.send_to)
+
     def unique_race_triggers(self, race_id: int):  # this is for handling triggers upon race completion (not used)
         pass
 
@@ -316,6 +351,8 @@ class GameView(arcade.View):
             self.physics_engine.set_velocity(platform, velocity)
 
     def on_update(self, delta_time: float = 1/60):
+        if self.level is None:
+            return
         self.physics_engine.step(1 / 120)
         self.update_platforms(1 / 120)
         self.physics_engine.step(1 / 120)
@@ -385,13 +422,10 @@ class GameView(arcade.View):
         # upd: why tho
 
 
-def main():
+if __name__ == "__main__":
     game = arcade.Window(SCREEN_WIDTH, SCREEN_HEIGHT, "Alien game", resizable=True)
+    main_menu = MainMenu()
     game.set_minimum_size(1, 2)
     arcade.set_background_color(arcade.color.SPACE_CADET)
-    game.show_view(MainMenu())
+    game.show_view(main_menu)
     arcade.run()
-
-
-if __name__ == "__main__":
-    main()

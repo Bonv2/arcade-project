@@ -199,3 +199,11 @@ class TimerDisplay(arcade.Sprite):
         rect = arcade.rect.XYWH(*self.position, self.width, self.height)
         arcade.draw_rect_filled(rect, arcade.color.BLACK)
         self.batch.draw()
+
+
+class LevelEnd(arcade.Sprite):
+    def __init__(self, pos: Tuple[float, float], size: Tuple[float, float], send_to: str) -> None:
+        super().__init__()
+        self.position = pos
+        self.width, self.height = size
+        self.send_to = send_to
