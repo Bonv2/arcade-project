@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="53" height="38" tilewidth="64" tileheight="64" infinite="0" nextlayerid="5" nextobjectid="27">
+ <tileset firstgid="1" source="alien.tsx"/>
+ <layer id="1" name="walls" width="53" height="38">
+  <data encoding="base64" compression="zlib">
+   eJztl70OwjAMhCtW5gIbKmLh5/2fD1diqhLZsX3YFf6kU5fY6l0Sq50mHQvppqzNyov0VtRVFjq43DLmyr0Tl9svch0l4zsVhRXv+ZFhHnnfVcTdR+QUnT0ip5q7fZD73eo9G+slIPe71ftqrM/IiKfsnEhn0v377Omi7B85Mx+gvtZz6pnJ2uvoICu9TFpeOf8H0tNBKFpeuTOR3ZOG8sR7iv5mXPH2NDr/EBlEnz1EBtGeRpFksDdPEspTeYoC5clrRkv6bNegPHn9T0r6bNfU2duHp6L4Vz42vjmT
+  </data>
+ </layer>
+ <objectgroup id="2" name="collisions">
+  <object id="1" gid="100" x="1792" y="192" width="128" height="128"/>
+  <object id="2" gid="100" x="1536" y="768" width="128" height="128"/>
+  <object id="3" gid="100" x="1792" y="960" width="128" height="128"/>
+  <object id="4" gid="100" x="2240" y="640" width="128" height="128"/>
+  <object id="5" gid="100" x="2688" y="896" width="128" height="128"/>
+  <object id="6" gid="100" x="2496" y="1152" width="128" height="128"/>
+  <object id="7" gid="100" x="2624" y="1536" width="128" height="128"/>
+  <object id="8" gid="100" x="1344" y="2176" width="1152" height="1024"/>
+  <object id="9" gid="100" x="2752" y="2048" width="128" height="128"/>
+  <object id="10" gid="100" x="1088" y="2112" width="128" height="128"/>
+  <object id="11" gid="100" x="512" y="2112" width="128" height="128"/>
+  <object id="12" gid="100" x="0" y="1664" width="128" height="128"/>
+  <object id="13" gid="100" x="768" y="1728" width="128" height="128"/>
+  <object id="14" gid="100" x="832" y="1344" width="128" height="128"/>
+  <object id="15" gid="100" x="512" y="1344" width="128" height="128"/>
+  <object id="16" gid="100" x="128" y="1280" width="128" height="128"/>
+  <object id="17" gid="100" x="768" y="960" width="128" height="128"/>
+  <object id="18" gid="100" x="192" y="768" width="128" height="128"/>
+  <object id="19" gid="100" x="960" y="640" width="128" height="128"/>
+  <object id="20" gid="100" x="512" y="320" width="128" height="128"/>
+  <object id="21" gid="100" x="896" y="128" width="128" height="128"/>
+  <object id="22" gid="100" x="0" y="320" width="128" height="128"/>
+  <object id="23" gid="100" x="2880" y="320" width="128" height="128"/>
+  <object id="24" gid="100" x="960" y="1088" width="704" height="64"/>
+  <object id="25" gid="100" x="1088" y="1152" width="64" height="320"/>
+ </objectgroup>
+ <objectgroup id="4" name="special">
+  <object id="26" gid="30" x="1536" y="1024" width="64" height="64">
+   <properties>
+    <property name="type" value="player_spawn"/>
+   </properties>
+  </object>
+ </objectgroup>
+</map>

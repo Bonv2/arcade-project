@@ -162,6 +162,7 @@ class Player(arcade.Sprite):
             return
         if checkpoint.reset_timer:
             self.view.cur_race_timer = 0
+            self.view.timer_bleep = 0
         sound = arcade.Sound("assets/sounds/teleport.wav")
         sound.play(loop=False, volume=0.5)
         x, y = checkpoint.position
