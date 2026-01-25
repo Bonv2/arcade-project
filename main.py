@@ -10,7 +10,7 @@ from constants import *
 from extra_views import MainMenu, PauseView
 from util import *
 from player_logic import Player
-from objects import Checkpoint, RaceEnd, Respawn, TimerDisplay
+from objects import Checkpoint, RaceEnd, Respawn, TimerDisplay, TextDisplay
 
 
 class GameView(arcade.View):
@@ -34,6 +34,7 @@ class GameView(arcade.View):
 
         self.special_list = tile_map.sprite_lists["special"]
         self.level_end_list = arcade.SpriteList(use_spatial_hash=True)
+        self.text_displays = arcade.SpriteList()
 
         self.player: Player | None = Player(self)
         for special in self.special_list:
@@ -45,6 +46,16 @@ class GameView(arcade.View):
                 special.send_to = special.properties["send_to"]
                 special.properties = None
                 self.level_end_list.append(special)
+            elif type == "text_display":
+                text = special.properties["text"]
+                color = (int(i )for i in special.properties["color"].split("."))
+                draw_screen = special.properties["draw_screen"]
+                font_size = special.properties["font_size"]
+                pos = special.position
+                size = (special.width, special.height)
+                screen = TextDisplay(pos, size, text, color, font_size, draw_screen)
+                self.text_displays.append(screen)
+
 
         self.player_list = arcade.SpriteList()
         self.player_list.append(self.player)
@@ -65,11 +76,12 @@ class GameView(arcade.View):
 
         self.cur_checkpoint: Checkpoint | None = None
         for platform in self.platform_list:
-            x, y = platform.position
-            platform.boundary_left = x + platform.boundary_left * 64
-            platform.boundary_top = y + platform.boundary_top * 64
-            platform.boundary_right = x + platform.boundary_right * 64
-            platform.boundary_bottom = y + platform.boundary_bottom * 64
+            left, right = platform.left, platform.right
+            bottom, top = platform.bottom, platform.top
+            platform.boundary_left = left + platform.boundary_left * 64
+            platform.boundary_top = top + platform.boundary_top * 64
+            platform.boundary_right = right + platform.boundary_right * 64
+            platform.boundary_bottom = bottom + platform.boundary_bottom * 64
 
         displays = tile_map.sprite_lists["displays"]
         for display in displays:
@@ -221,6 +233,8 @@ class GameView(arcade.View):
             self.background_list.draw()
             for display in self.display_list:
                 display.draw()
+            for display in self.text_displays:
+                display.draw()
             self.checkpoint_list.draw()
             for checkpoint in self.checkpoint_list:
                 checkpoint.draw()
@@ -291,7 +305,8 @@ class GameView(arcade.View):
         if level_end_collision:
             level_end = level_end_collision[0]
             if level_end.send_to == "menu":
-                self.window.show_view(main_menu)
+                self.main_menu.manager.enable()
+                self.window.show_view(self.main_menu)
                 self.level = None
             else:
                 self.setup(level_end.send_to)

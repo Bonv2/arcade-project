@@ -208,3 +208,25 @@ class LevelEnd(arcade.Sprite):
         self.position = pos
         self.width, self.height = size
         self.send_to = send_to
+
+
+class TextDisplay(arcade.Sprite):
+    def __init__(self, pos: Tuple[float, float], size: Tuple[float, float], text: str, color: Tuple[int, int, int, int] = arcade.color.WHITE, font_size: int = 20, draw_screen: bool = True) -> None:
+        super().__init__()
+        self.position = pos
+        self.width = size[0]
+        self.height = size[1]
+        self.batch = Batch()
+        self.draw_screen = draw_screen
+        self.info_text = arcade.Text(f"{text}",
+                                           x=self.center_x, y=self.center_y,
+                                           anchor_x="center", anchor_y="center",
+                                           color=color, font_size=font_size,
+                                           batch=self.batch, width=self.width, height=self.height,
+                                     multiline=True)
+
+    def draw(self) -> None:
+        if self.draw_screen:
+            rect = arcade.rect.XYWH(*self.position, self.width, self.height)
+            arcade.draw_rect_filled(rect, arcade.color.BLACK)
+        self.batch.draw()

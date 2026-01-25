@@ -95,7 +95,7 @@ class MainMenu(MenuBackground):
         return res
 
     def setup_widgets(self):
-        spacer = UISpace(width=200)
+        spacer = UISpace(width=220)
         self.box_layout.add(spacer)
         label = UILabel(text="Alien Game",
                         font_size=20,
@@ -132,6 +132,34 @@ class MainMenu(MenuBackground):
                         align="left",
                         multiline=True,)
         self.box1_layout.add(self.label1)
+
+        texture_button2 = UITextureButton(texture=texture_normal,
+                                          texture_hovered=texture_hovered,
+                                          texture_pressed=texture_pressed,
+                                          text="Options",
+                                          scale=1.0)
+        self.box_layout.add(texture_button2)
+
+        spacer = UISpace(height=40)
+        self.box_layout.add(spacer)
+
+        texture_button1 = UITextureButton(texture=texture_normal,
+                                         texture_hovered=texture_hovered,
+                                         texture_pressed=texture_pressed,
+                                         text="Exit",
+                                         scale=1.0)
+        self.box_layout.add(texture_button1)
+
+        @texture_button1.event("on_click")
+        def on_click_texture_button(event):
+            self.window.close()
+
+        @texture_button2.event("on_click")
+        def on_click_texture_button(event):
+            self.manager.disable()
+            options_view = OptionView(self)
+            options_view.on_resize(self.width, self.height)
+            self.window.show_view(options_view)
 
     def on_show_view(self):
         ok = self.get_best_times_dict()
@@ -188,6 +216,12 @@ class LevelSelection(MenuBackground):
         texture_normal = arcade.load_texture("assets/ui/button_normal.png")
         texture_hovered = arcade.load_texture("assets/ui/button_hover.png")
         texture_pressed = arcade.load_texture("assets/ui/button_pressed.png")
+        texture_button1 = UITextureButton(texture=texture_normal,
+                                         texture_hovered=texture_hovered,
+                                         texture_pressed=texture_pressed,
+                                         text="tutorial",
+                                         scale=1.0)
+        self.box_layout.add(texture_button1)
         texture_button = UITextureButton(texture=texture_normal,
                                          texture_hovered=texture_hovered,
                                          texture_pressed=texture_pressed,
@@ -196,18 +230,22 @@ class LevelSelection(MenuBackground):
         self.box_layout.add(texture_button)
         spacer = UISpace(height=30,)
         self.box_layout.add(spacer)
-        texture_button1 = UITextureButton(texture=texture_normal,
+        texture_button999 = UITextureButton(texture=texture_normal,
                                          texture_hovered=texture_hovered,
                                          texture_pressed=texture_pressed,
                                          text="Back",
                                          scale=1.0)
-        self.box_layout.add(texture_button1)
+        self.box_layout.add(texture_button999)
 
         @texture_button.event("on_click")
         def on_click_texture_button(event):
             self.show_game_view("race")
 
         @texture_button1.event("on_click")
+        def on_click_texture_button(event):
+            self.show_game_view("tutorial")
+
+        @texture_button999.event("on_click")
         def on_click_texture_button(event):
             self.show_menu_view()
 
@@ -416,6 +454,7 @@ class OptionView(arcade.View):
         def on_click_texture_button(event):
             self.manager.disable()
             self.parent.manager.enable()
+            self.parent.on_resize(self.width, self.height)
             self.parent.manager.on_resize(self.width, self.height)
             self.window.show_view(self.parent)
 
