@@ -5,6 +5,7 @@ from typing import Tuple, Dict
 from arcade.particles import (FadeParticle, Emitter, EmitInterval)
 from pyglet.graphics import Batch
 from constants import *
+from util import read_settings
 
 
 def checkpoint_mutator(p) -> None:
@@ -55,7 +56,7 @@ class Checkpoint(Respawn):
     def activate(self) -> None:
         super().activate()
         sound = arcade.load_sound("assets/sounds/activate_checkpoint.wav")
-        sound.play(loop=False, volume=0.5)
+        sound.play(loop=False, volume=0.5 * read_settings().get("volume", 100) / 100)
         self.emitter = make_checkpoint_particles(*self.position)
 
     def deactivate(self) -> None:

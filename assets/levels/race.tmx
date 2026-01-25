@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="84" height="54" tilewidth="64" tileheight="64" infinite="0" nextlayerid="10" nextobjectid="129">
+<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="84" height="54" tilewidth="64" tileheight="64" infinite="0" nextlayerid="10" nextobjectid="133">
  <tileset firstgid="1" source="alien.tsx"/>
  <layer id="2" name="background" width="84" height="54">
   <data encoding="base64" compression="zlib">
@@ -91,28 +91,28 @@
   <object id="104" gid="32" x="4448" y="1664" width="128" height="64">
    <properties>
     <property name="boundary_bottom" type="float" value="0"/>
-    <property name="boundary_left" type="float" value="-3"/>
-    <property name="boundary_right" type="float" value="3"/>
+    <property name="boundary_left" type="float" value="-4"/>
+    <property name="boundary_right" type="float" value="4"/>
     <property name="boundary_top" type="float" value="0"/>
     <property name="change_x" type="float" value="3"/>
     <property name="change_y" type="float" value="0"/>
    </properties>
   </object>
-  <object id="105" gid="32" x="4416" y="1536" width="128" height="64">
+  <object id="105" gid="32" x="4640" y="1536" width="128" height="64">
    <properties>
     <property name="boundary_bottom" type="float" value="0"/>
-    <property name="boundary_left" type="float" value="-2.5"/>
-    <property name="boundary_right" type="float" value="3.5"/>
+    <property name="boundary_left" type="float" value="-6"/>
+    <property name="boundary_right" type="float" value="1"/>
     <property name="boundary_top" type="float" value="0"/>
     <property name="change_x" type="float" value="2"/>
     <property name="change_y" type="float" value="0"/>
    </properties>
   </object>
-  <object id="106" gid="32" x="4352" y="1408" width="128" height="64">
+  <object id="106" gid="32" x="4256" y="1408" width="128" height="64">
    <properties>
     <property name="boundary_bottom" type="float" value="0"/>
-    <property name="boundary_left" type="float" value="-1.5"/>
-    <property name="boundary_right" type="float" value="4.5"/>
+    <property name="boundary_left" type="float" value="-1"/>
+    <property name="boundary_right" type="float" value="6"/>
     <property name="boundary_top" type="float" value="0"/>
     <property name="change_x" type="float" value="3"/>
     <property name="change_y" type="float" value="0"/>
@@ -126,7 +126,7 @@
  </layer>
  <layer id="1" name="walls" width="84" height="54">
   <data encoding="base64" compression="zlib">
-   eJztm0lPwzAQhafAha1CYpdAhAqBWCTgCAf2A+sR+P//BI9aS1bIYjvPmSadJz2pqhpn/KXxjO2ESJXXofFypFX/NWd8ZjxvvBJo1X9ZngPpQHoi5YmV8sRKeWJ1TuPcciMdSI+0a3wiHURHxKy2a3xpfCAVYIfkw9JlWiVb949SBdsBca5B5RnNW8oTLeWJlfLESnlipTyxUp5YIXnaeekFqL0uCslTheWp8yMdP9FSnlgpT6yUJ1bKEyutP7FC15+bwLa6qDKeWzRek98JbG/W90TQ/09pnnXPWo1yv0PPPdA8T4FtxcjmxDKv0pjjkNLkTiRP6bGT9xaXyO85tQVqj2csF8l7nVnW7b+64lpkzXiRyvdzQ3MHi3nyPWDHEc5DR5FtSfKMOXeKeO11cmtGdwzMKo69Mr4uOa5txbBJFS+yXakxVLquiFFRLZKvN6T65Z7X1s75MTBrMyAPFdUi+VwmxXOf4sZ8Cdlx0oen79jR5B2HIt8G9on/w3tU/8yW7zXi9jZAfVkPPDerru4Otb2uWUAM6HuJ+2Tf2bD1bZO+hJ479p2RotrcjSHzjCEFz4HzuYrZo/GT42fC8ETMT4rmJJnHcSl45uezZf4w/nT8RdPN00cpeOa53RnfT/xA08GTc1fVOhDPSarWsMvWHtvg+Wr8NvG78/238Y/jX2qP5wuFr/n7zCskeabKR1XH2poqphY6pvp6Y9Z4+u5H1Y0HZeojT5sPm3hY0I6tiZu8XxHbJ0meKcw1rcQeqyRPey+nsNR+tSTPPkp5YqU80yvPU9VMaJ5/E2lVBQ==
+   eJztm0lPwzAQhafAha1CYpdAhAqBWCTgCAf2A+sR+P//BFutJcvEie08Z5p0nvTUqmqc8ZfEM44TIpGrQ+XlRIv+a075THleeSXSov8yPAfcgfREwhMr4YmV8MTqnMa55YY7kB5pV/mEO4iOSLParvGl8gFXgB1SCEubaZVM3T/KFWwHpHMNKs9I3hKeaAlPrIQnVsITK+GJlfDECsnTzEsvQO11UUieIixPmR/J+ImW8MRKeGIlPLESnlhJ/YkVuv7cBLbVRfl4btH4nvxO4O9Gs74mgj4/uXnWPWs1cv6Hnns04VmUfD9tEgxAJif6vEpjjkPKkzuR5yf32KnXFpco7Dm1BWqPZyyXYvLJea1rlnXrr7Z0LbKmvEj+9VxfjqiS5qmvATOO6HxzlNgWJ8+UfeeI1xwnu2a0x8CiYtsr5WvPdm0rhU2ueJHtco2h3HVFispqEbfe4OqXvV9TI7tjYNFmQAEqq0XcXMbFc5/SxnwOmXEyhGfo2NHkHYcy30b2SZ/De1T/zFboMdLtbYD6sh65b626ujvW5rgWETGgryXdJ/POhqlvm/Qldt+p74yU1eZ2DEVgDDl4DqzvVcwelZ8sPxOGJ2J+UjYnKQK2y8HTnc/6/KH8afmLpptniHLwdLndKd9P/EDTwVPnrqr7QHpOUnUP23ePsQ2er8pvE79bv38r/1j+pfZ4vlD8Pf+QeQUnz1z5qGpbU1Ol1ELHVF9vzBrP0PWouvHApz7yNPmwiYcl7ZiauMn7Fal94uSZw7qm5Vhj5eRpruUc5lqv5uTZRwlPrIRnfrk8Rc2E5vkH2glVqg==
   </data>
  </layer>
  <objectgroup id="7" name="collisions" opacity="0.24">
@@ -175,6 +175,10 @@
   <object id="126" gid="100" x="5120" y="1920" width="64" height="256"/>
   <object id="127" gid="100" x="5056" y="2176" width="64" height="256"/>
   <object id="128" gid="100" x="5120" y="2432" width="64" height="256"/>
+  <object id="129" gid="100" x="4608" y="1792" width="192" height="64"/>
+  <object id="130" gid="100" x="4928" y="2048" width="64" height="64"/>
+  <object id="131" gid="100" x="4800" y="1920" width="64" height="64"/>
+  <object id="132" gid="100" x="4992" y="1920" width="64" height="64"/>
  </objectgroup>
  <objectgroup id="9" name="special">
   <object id="86" gid="30" x="704" y="3008" width="64" height="64">

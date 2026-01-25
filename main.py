@@ -1,142 +1,16 @@
 import arcade
 import random
 import math
-import os
 
 import pymunk
 from pyglet.graphics import Batch
-from arcade.gui import (UIManager, UIFlatButton, UITextureButton, UILabel,
-                        UIInputText, UITextArea, UISlider, UIDropdown, UIMessageBox, UISpace)  # Это разные виджеты
-from arcade.gui.widgets.layout import UIAnchorLayout, UIBoxLayout  # А это менеджеры компоновки, как в pyQT
-from typing import Tuple, Dict
+from typing import Tuple
 
 from constants import *
+from extra_views import MainMenu, PauseView
+from util import *
 from player_logic import Player
 from objects import Checkpoint, RaceEnd, Respawn, TimerDisplay
-
-
-class MainMenu(arcade.View):
-    def __init__(self):
-        super().__init__()
-        self.is_set_up = False
-        with open("assets/shaders/stars_shader.glsl", "r", encoding="utf-8") as file:
-            self.stars_shader = arcade.experimental.Shadertoy((int(self.width), int(self.height)), file.read())
-        self.setup()
-
-    def get_best_times_dict(self) -> Dict[str, Dict[int, float]]:
-        contents = os.listdir("assets/saved/")
-        res = {}
-        for file in contents:
-            try:
-                with open(f"assets/saved/{file}", "r") as file:
-                    ok = [i.rstrip("\n").split(";") for i in file.readlines()]
-                    ok = [(int(i[0]), float(i[1])) for i in ok]
-                    ok = dict(ok)
-            except FileNotFoundError:
-                pass
-            res[file.name[13:].rstrip(".txt")] = ok
-        return res
-
-    def setup(self):
-        self.manager = UIManager()
-        self.manager.enable()  # Включить, чтоб виджеты работали
-        self.anchor_layout = UIAnchorLayout()  # Центрирует виджеты
-        self.box_layout = UIBoxLayout(vertical=True, space_between=10)  # Вертикальный стек
-        self.box1_layout = UIBoxLayout(vertical=True, space_between=10)
-        self.background_texture = arcade.load_texture("assets/menu_thing.png")
-
-        self.world_camera = arcade.Camera2D()
-
-        tile_map = arcade.load_tilemap("assets/levels/main_menu.tmx")
-        self.wall_list = tile_map.sprite_lists["walls"]
-        self.player = Player(self)
-        special = tile_map.sprite_lists["special"]
-        for sprite in special:
-            if sprite.properties.get("type", None) == "player_spawn":
-                self.player.bottom = sprite.bottom
-                self.player.center_x = sprite.center_x
-        self.player_list = arcade.SpriteList()
-        self.player_list.append(self.player)
-
-        self.setup_widgets()  # Функция ниже
-
-        self.anchor_layout.add(self.box_layout, anchor_x="left")  # Box в anchor
-        self.anchor_layout.add(self.box1_layout, anchor_x="right")
-        self.manager.add(self.anchor_layout)  # Всё в manager
-
-        self.is_set_up = True
-
-    def on_resize(self, width: int, height: int) -> bool | None:
-        self.world_camera.match_window(viewport=True, projection=True)
-        self.stars_shader.resize((width, height))
-
-    def setup_widgets(self):
-        spacer = UISpace(width=200)
-        self.box_layout.add(spacer)
-        label = UILabel(text="Alien Game",
-                        font_size=20,
-                        text_color=arcade.color.WHITE,
-                        width=300,
-                        align="center")
-        self.box_layout.add(label)
-        texture_normal = arcade.load_texture("assets/ui/button_normal.png")
-        texture_hovered = arcade.load_texture("assets/ui/button_hover.png")
-        texture_pressed = arcade.load_texture("assets/ui/button_pressed.png")
-        texture_button = UITextureButton(texture=texture_normal,
-                                         texture_hovered=texture_hovered,
-                                         texture_pressed=texture_pressed,
-                                         text="Play",
-                                         scale=1.0)
-        self.box_layout.add(texture_button)
-
-        @texture_button.event("on_click")
-        def on_click_texture_button(event):
-            self.show_level_view()
-
-        ok = self.get_best_times_dict()
-        res = []
-        for key in ok.keys():
-            res.append(f"{key}:")
-            for kkey in ok[key].keys():
-                res.append(f"{str(kkey)}: {self.time_string(float(ok[key][kkey]))}")
-        res = "\n".join(res)
-
-        label1 = UILabel(text=res,
-                        font_size=20,
-                        text_color=arcade.color.WHITE,
-                        width=300,
-                        align="left",
-                        multiline=True,)
-        self.box1_layout.add(label1)
-
-    def on_draw(self):
-        self.clear()
-        self.stars_shader.render()
-        self.world_camera.use()
-        self.wall_list.draw()
-        self.player_list.draw()
-        self.manager.draw()
-
-    def on_key_press(self, symbol, modifiers):
-        if symbol == arcade.key.F11:
-            self.window.set_fullscreen(not self.window.fullscreen)
-        elif symbol == arcade.key.ESCAPE:
-            self.window.set_fullscreen(False)
-
-    def show_level_view(self):
-        game_view = LevelSelection()
-        self.window.show_view(game_view)
-
-    def on_update(self, delta_time: float):
-        if self.is_set_up:
-            self.world_camera.position = (self.player.position[0] + 100, self.player.position[1])
-            self.player.update_animation(delta_time)
-
-    def time_string(self, time: float = 0) -> str:
-        m = str(int(time // 60)).rjust(2, "0")
-        s = str(math.floor(time % 60)).rjust(2, "0")
-        ms = str(time - math.floor(time))[2:4].rjust(2, "0")
-        return f"{m}:{s}:{ms}"
 
 
 class GameView(arcade.View):
@@ -150,7 +24,6 @@ class GameView(arcade.View):
             self.stars_shader = arcade.experimental.Shadertoy((int(self.width), int(self.height)), file.read())
         self.world_camera = arcade.camera.Camera2D()
         self.ui_camera = arcade.camera.Camera2D()
-
 
     def setup(self, level: str) -> None:
         self.all_sprites = arcade.SpriteList()
@@ -405,7 +278,7 @@ class GameView(arcade.View):
                 self.cur_race = race_id
                 self.cur_checkpoint = Respawn(node.position)
                 sound = arcade.Sound("assets/sounds/race_start.wav")
-                sound.play(loop=False, volume=0.5)
+                sound.play(loop=False, volume=0.5 * read_settings().get("volume", 100) / 100)
                 for checkpoint in self.checkpoint_list:
                     checkpoint.deactivate()
                 self.cur_race_timer = 0
@@ -489,20 +362,24 @@ class GameView(arcade.View):
         if self.timer_bleep >= 1:
             self.timer_bleep -= 1
             sound = arcade.Sound("assets/sounds/timer_bleep.wav")
-            sound.play(loop=False, volume=0.5)
+            sound.play(loop=False, volume=0.5 * read_settings().get("volume", 100) / 100)
         if self.mini_timer_bleep >= 0.05:
             self.mini_timer_bleep -= 0.05
             sound = arcade.Sound("assets/sounds/timer_bleep.wav")
-            sound.play(loop=False, volume=0.1)
+            sound.play(loop=False, volume=0.1 * read_settings().get("volume", 100) / 100)
 
         self.player.update(self.world_to_cam(self.mouse_pos, self.world_camera), self.keys_pressed, delta_time)
         self.player.update_animation(delta_time)
 
     def on_key_press(self, symbol, modifiers):
         if symbol == arcade.key.F11:
-            self.window.set_fullscreen(not self.window.fullscreen)
+            fullscreen = not self.window.fullscreen
+            save_settings(fullscreen=fullscreen)
+            self.window.set_fullscreen(fullscreen)
         elif symbol == arcade.key.ESCAPE:
-            self.window.show_view(PauseView(self))
+            pause_view = PauseView(self)
+            pause_view.on_resize(self.width, self.height)
+            self.window.show_view(pause_view)
         elif symbol not in self.keys_pressed:
             self.keys_pressed.add(symbol)
 
@@ -533,176 +410,12 @@ class GameView(arcade.View):
         # upd: why tho
 
 
-class LevelSelection(arcade.View):
-    def __init__(self):
-        super().__init__()
-        self.is_set_up = False
-        with open("assets/shaders/stars_shader.glsl", "r", encoding="utf-8") as file:
-            self.stars_shader = arcade.experimental.Shadertoy((int(self.width), int(self.height)), file.read())
-        self.setup()
-
-    def setup(self):
-        self.manager = UIManager()
-        self.manager.enable()  # Включить, чтоб виджеты работали
-        self.anchor_layout = UIAnchorLayout()  # Центрирует виджеты
-        self.box_layout = UIBoxLayout(vertical=True, space_between=10)  # Вертикальный стек
-        self.box1_layout = UIBoxLayout(vertical=True, space_between=10)
-        self.background_texture = arcade.load_texture("assets/menu_thing.png")
-
-        self.world_camera = arcade.Camera2D()
-
-        tile_map = arcade.load_tilemap("assets/levels/main_menu.tmx")
-        self.wall_list = tile_map.sprite_lists["walls"]
-        self.player = Player(self)
-        special = tile_map.sprite_lists["special"]
-        for sprite in special:
-            if sprite.properties.get("type", None) == "player_spawn":
-                self.player.bottom = sprite.bottom
-                self.player.center_x = sprite.center_x
-        self.player_list = arcade.SpriteList()
-        self.player_list.append(self.player)
-
-        self.setup_widgets()  # Функция ниже
-
-        self.anchor_layout.add(self.box_layout, anchor_x="center")  # Box в anchor
-        self.manager.add(self.anchor_layout)  # Всё в manager
-
-        self.is_set_up = True
-
-    def on_resize(self, width: int, height: int) -> bool | None:
-        self.world_camera.match_window(viewport=True, projection=True)
-        self.stars_shader.resize((width, height))
-
-    def setup_widgets(self):
-        label = UILabel(text="Level Selection",
-                        font_size=20,
-                        text_color=arcade.color.WHITE,
-                        width=300,
-                        align="center")
-        self.box_layout.add(label)
-        texture_normal = arcade.load_texture("assets/ui/button_normal.png")
-        texture_hovered = arcade.load_texture("assets/ui/button_hover.png")
-        texture_pressed = arcade.load_texture("assets/ui/button_pressed.png")
-        texture_button = UITextureButton(texture=texture_normal,
-                                         texture_hovered=texture_hovered,
-                                         texture_pressed=texture_pressed,
-                                         text="race",
-                                         scale=1.0)
-        self.box_layout.add(texture_button)
-        spacer = UISpace(height=30,)
-        self.box_layout.add(spacer)
-        texture_button1 = UITextureButton(texture=texture_normal,
-                                         texture_hovered=texture_hovered,
-                                         texture_pressed=texture_pressed,
-                                         text="Back",
-                                         scale=1.0)
-        self.box_layout.add(texture_button1)
-
-        @texture_button.event("on_click")
-        def on_click_texture_button(event):
-            self.show_game_view("race")
-
-        @texture_button1.event("on_click")
-        def on_click_texture_button(event):
-            self.show_menu_view()
-
-    def on_show(self):
-        pass
-
-    def on_draw(self):
-        self.clear()
-        self.stars_shader.render()
-        self.world_camera.use()
-        self.wall_list.draw()
-        self.player_list.draw()
-        self.manager.draw()
-
-    def on_key_press(self, symbol, modifiers):
-        if symbol == arcade.key.F11:
-            self.window.set_fullscreen(not self.window.fullscreen)
-        elif symbol == arcade.key.ESCAPE:
-            self.window.set_fullscreen(False)
-
-    def show_game_view(self, level: str):
-        game_view = GameView()
-        game_view.setup(level=level)
-        self.window.show_view(game_view)
-
-    def show_menu_view(self):
-        self.window.show_view(main_menu)
-
-    def on_update(self, delta_time: float):
-        if self.is_set_up:
-            self.world_camera.position = (self.player.position[0] + 100, self.player.position[1])
-            self.player.update_animation(delta_time)
-
-
-class PauseView(arcade.View):
-    def __init__(self, view: GameView):
-        super().__init__()
-        self.parent = view
-        self.setup()
-
-    def setup(self):
-        self.manager = UIManager()
-        self.manager.enable()
-        self.anchor_layout = UIAnchorLayout()
-        self.box_layout = UIBoxLayout(vertical=True, space_between=10)
-
-        self.setup_widgets()  # Функция ниже
-
-        self.anchor_layout.add(self.box_layout, anchor_x="center")  # Box в anchor
-        self.manager.add(self.anchor_layout)  # Всё в manager
-
-    def setup_widgets(self):
-        label = UILabel(text="Pause",
-                        font_size=20,
-                        text_color=arcade.color.WHITE,
-                        width=300,
-                        align="center")
-        self.box_layout.add(label)
-        texture_normal = arcade.load_texture("assets/ui/button_normal.png")
-        texture_hovered = arcade.load_texture("assets/ui/button_hover.png")
-        texture_pressed = arcade.load_texture("assets/ui/button_pressed.png")
-        texture_button = UITextureButton(texture=texture_normal,
-                                         texture_hovered=texture_hovered,
-                                         texture_pressed=texture_pressed,
-                                         text="Options",
-                                         scale=1.0)
-        self.box_layout.add(texture_button)
-        spacer = UISpace(height=30,)
-        self.box_layout.add(spacer)
-        texture_button1 = UITextureButton(texture=texture_normal,
-                                         texture_hovered=texture_hovered,
-                                         texture_pressed=texture_pressed,
-                                         text="Back",
-                                         scale=1.0)
-        self.box_layout.add(texture_button1)
-
-        @texture_button1.event("on_click")
-        def on_click_texture_button(event):
-            self.window.show_view(self.parent)
-
-    def on_show(self):
-        pass
-
-    def on_draw(self):
-        self.clear()
-        rect = arcade.rect.XYWH(self.width / 2, self.height / 2, self.width, self.height)
-        arcade.draw_rect_filled(rect, arcade.color.BLACK)
-        self.manager.draw()
-
-    def on_key_press(self, symbol, modifiers):
-        if symbol == arcade.key.F11:
-            self.window.set_fullscreen(not self.window.fullscreen)
-        elif symbol == arcade.key.ESCAPE:
-            self.window.show_view(self.parent)
-
-
 if __name__ == "__main__":
     game = arcade.Window(SCREEN_WIDTH, SCREEN_HEIGHT, "Alien game", resizable=True)
-    main_menu = MainMenu()
+    game_view = GameView()
+    main_menu = MainMenu(game_view)
+    game_view.main_menu = main_menu
     game.set_minimum_size(1, 2)
-    arcade.set_background_color(arcade.color.SPACE_CADET)
+    arcade.set_background_color(arcade.color.BLACK)
     game.show_view(main_menu)
     arcade.run()

@@ -1,0 +1,2 @@
+volume;100
+fullscreen;0

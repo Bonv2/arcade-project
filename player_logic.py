@@ -2,6 +2,7 @@ import arcade
 import random
 from arcade.particles import (FadeParticle, Emitter, EmitBurst)
 from typing import Tuple, List
+from util import read_settings
 
 from constants import *
 
@@ -95,7 +96,7 @@ class Player(arcade.Sprite):
         if y >= 90:
             if self.coyote_time <= COYOTE_TIME:
                 sound = arcade.Sound("assets/sounds/jump.wav")
-                sound.play(loop=False, volume=0.5)
+                sound.play(loop=False, volume=0.5 * read_settings().get("volume", 100) / 100)
                 self.coyote_time = 999
                 impulse = (0, PLAYER_JUMP_IMPULSE)
                 self.emitters.append(make_jump_particles(self.center_x, self.bottom + 3))
@@ -164,7 +165,7 @@ class Player(arcade.Sprite):
             self.view.cur_race_timer = 0
             self.view.timer_bleep = 0
         sound = arcade.Sound("assets/sounds/teleport.wav")
-        sound.play(loop=False, volume=0.5)
+        sound.play(loop=False, volume=0.5 * read_settings().get("volume", 100) / 100)
         x, y = checkpoint.position
         y += 10
         self.emitters.append(make_tp_particles(*self.position))
