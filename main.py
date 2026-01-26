@@ -1,48 +1,56 @@
 import arcade
-
-from player_logic import Player
-
-SCREEN_WIDTH = 800
-SCREEN_HEIGHT = 600
-
+import arcade.gui
+import subprocess
+import sys
+import os
 
 
-class MainMenu(arcade.View):
-    def on_show(self):
-        pass
-
-    def on_draw(self):
-        self.clear()
-
-    def on_key_press(self, symbol, modifiers):
-        if symbol == arcade.key.SPACE:
-            self.window.show_view(GameView())
-
-
-class GameView(arcade.View):
+class MyWindow(arcade.Window):
     def __init__(self):
-        super().__init__()
-        self.player = Player()
-        self.player.center_x = self.width / 2
-        self.player.center_y = self.height / 2
-        self.player_list = arcade.SpriteList()
-        self.player_list.append(self.player)
+        super().__init__(800, 600, "Меню выбора игр", resizable=True)
 
-    def on_show(self):
-        pass
+        self.manager = arcade.gui.UIManager()
+        self.manager.enable()
+
+        self.anchor_layout = arcade.gui.UIAnchorLayout()
+
+        self.v_box = arcade.gui.UIBoxLayout(space_between=20)
+
+        btn_maksim = arcade.gui.UIFlatButton(text="Максим Тарасов", width=250)
+        btn_alien = arcade.gui.UIFlatButton(text="Alien-game (Владислав)", width=250)
+
+        self.v_box.add(btn_maksim)
+        self.v_box.add(btn_alien)
+
+        @btn_maksim.event("on_click")
+        def on_click_maksim(event):
+            self.launch_script("Maksim_Tarasov/main.py")
+
+        @btn_alien.event("on_click")
+        def on_click_alien(event):
+            self.launch_script("Alien-game/main.py")
+
+        self.anchor_layout.add(
+            child=self.v_box,
+            anchor_x="center_x",
+            anchor_y="center_y"
+        )
+
+        self.manager.add(self.anchor_layout)
+
+    def launch_script(self, relative_path):
+        base_path = os.path.dirname(os.path.abspath(__file__))
+        script_path = os.path.join(base_path, relative_path)
+
+        subprocess.Popen([sys.executable, script_path], cwd=os.path.dirname(script_path))
+
 
     def on_draw(self):
         self.clear()
-
-        self.player_list.draw()
-
-
-def main():
-    game = arcade.Window(SCREEN_WIDTH, SCREEN_HEIGHT, "Alien game")
-    arcade.set_background_color(arcade.color.OUTER_SPACE)
-    game.show_view(MainMenu())
-    arcade.run()
+        arcade.set_background_color(arcade.color.DARK_SLATE_GRAY)
+        self.manager.draw()
 
 
 if __name__ == "__main__":
-    main()
+    window = MyWindow()
+    arcade.run()
