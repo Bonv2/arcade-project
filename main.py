@@ -306,6 +306,8 @@ class GameView(arcade.View):
             level_end = level_end_collision[0]
             if level_end.send_to == "menu":
                 self.main_menu.manager.enable()
+                self.main_menu.on_resize(self.width, self.height)
+                self.main_menu.manager.on_resize(self.width, self.height)
                 self.window.show_view(self.main_menu)
                 self.level = None
             else:

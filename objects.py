@@ -120,6 +120,13 @@ class TimerDisplay(arcade.Sprite):
                                            anchor_x="left", anchor_y="bottom",
                                            color=self.text_color, font_size=25,
                                            font_name="Seven Segment", batch=self.batch)
+        devs = DEVS_RECORDS.get(self.level, {}).get(self.race_id, None)
+        devs = f"Dev record: {self.time_string(devs)}" if devs is not None else ""
+        self.devs_best = arcade.Text(f"{devs}",
+                                           x=left_bottom[0], y=left_bottom[1] + 120,
+                                           anchor_x="left", anchor_y="bottom",
+                                           color=arcade.color.RED, font_size=25,
+                                           font_name="Seven Segment", batch=self.batch)
         self.setup()
 
     def setup(self) -> None:
