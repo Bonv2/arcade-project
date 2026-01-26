@@ -155,11 +155,10 @@ class TimerDisplay(arcade.Sprite):
         for i, digit in enumerate(self.digits):
             digit.text = strin[i]
 
-    def save_best_time(self) -> None:
+    def save_best_time(self) -> None: # the raceend object should be doing this, this is bad
         ok = self.get_best_times_dict()
         ok[self.race_id] = self.best_time
         ok = [f"{i};{ok[i]}\n" for i in ok.keys()]
-        print("writing")
         with open(f"assets/saved/{self.level}.txt", "w") as file:
             for line in ok:
                 file.write(line)
@@ -201,7 +200,6 @@ class TimerDisplay(arcade.Sprite):
             self.update_color(color)
         else:
             self.update_color(arcade.color.WHITE)
-
 
     def draw(self) -> None:
         rect = arcade.rect.XYWH(*self.position, self.width, self.height)

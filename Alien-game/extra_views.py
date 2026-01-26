@@ -81,7 +81,11 @@ class MainMenu(MenuBackground):
         self.manager.add(self.anchor_layout)
 
     def get_best_times_dict(self) -> Dict[str, Dict[int, float]]:
-        contents = os.listdir("assets/saved/")
+        try:
+            contents = os.listdir("assets/saved/")
+        except FileNotFoundError:
+            os.mkdir("assets/saved")
+            contents = os.listdir("assets/saved/")
         res = {}
         for file in contents:
             try:
