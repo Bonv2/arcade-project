@@ -1,4 +1,7 @@
-def save_settings(volume: int = None, fullscreen: bool = None, ):
+from typing import Dict, Any
+
+
+def save_settings(volume: int = None, fullscreen: bool = None) -> None:
     settings = read_settings()
     if volume is not None:
         settings["volume"] = volume
@@ -8,7 +11,7 @@ def save_settings(volume: int = None, fullscreen: bool = None, ):
         lines = [f"{i};{int(settings[i])}\n" for i in settings.keys()]
         file.writelines(lines)
 
-def read_settings():
+def read_settings() -> Dict[str, Any]:
     res = {}
     try:
         with open("assets/settings.txt", "r") as file:

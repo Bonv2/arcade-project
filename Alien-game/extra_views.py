@@ -2,25 +2,28 @@ import arcade
 import os
 import math
 
-from typing import Dict
-
 from player_logic import Player
-from arcade.gui import (UIManager, UIFlatButton, UITextureButton, UILabel, UISliderStyle,
-                        UIInputText, UITextArea, UISlider, UIDropdown, UIMessageBox, UISpace, UITextureToggle)
+from arcade.future.light import Light, LightLayer
+from arcade.gui import (UIManager, UITextureButton, UILabel, UISliderStyle,
+                        UISlider, UISpace, UITextureToggle)
 from arcade.gui.widgets.layout import UIAnchorLayout, UIBoxLayout
 from util import *
+from constants import *
 
 
 class MenuBackground(arcade.View):
     def __init__(self):
         super().__init__()
         self.window.set_fullscreen(read_settings().get("fullscreen", False))
+        self.light_layer = None
+        self.time = 0
         with open("assets/shaders/stars_shader.glsl", "r", encoding="utf-8") as file:
             self.stars_shader = arcade.experimental.Shadertoy((int(self.width), int(self.height)), file.read())
         self.setup()
 
     def setup(self):
         self.world_camera = arcade.Camera2D()
+        self.light_layer = LightLayer(int(self.width), int(self.height))
 
         tile_map = arcade.load_tilemap("assets/levels/main_menu.tmx")
         self.wall_list = tile_map.sprite_lists["walls"]
@@ -30,6 +33,13 @@ class MenuBackground(arcade.View):
             if sprite.properties.get("type", None) == "player_spawn":
                 self.player.bottom = sprite.bottom
                 self.player.center_x = sprite.center_x
+
+        radius = 500
+        mode = 'soft'
+        color = PLAYER_LIGHT
+        self.player_light = Light(self.player.center_x, self.player.center_y, radius, color, mode)
+        self.light_layer.add(self.player_light)
+
         self.player_list = arcade.SpriteList()
         self.player_list.append(self.player)
 
@@ -38,13 +48,16 @@ class MenuBackground(arcade.View):
     def on_resize(self, width: int, height: int) -> bool | None:
         self.world_camera.match_window(viewport=True, projection=True)
         self.stars_shader.resize((width, height))
+        self.light_layer.resize(int(self.width), int(self.height))
 
     def on_draw(self):
         self.clear()
-        self.stars_shader.render()
-        self.world_camera.use()
-        self.wall_list.draw()
-        self.player_list.draw()
+        with self.light_layer:
+            self.stars_shader.render(time=self.time)
+            self.world_camera.use()
+            self.wall_list.draw()
+            self.player_list.draw()
+        self.light_layer.draw()
 
     def on_key_press(self, symbol, modifiers):
         if symbol == arcade.key.F11:
@@ -56,6 +69,7 @@ class MenuBackground(arcade.View):
 
     def on_update(self, delta_time: float):
         if self.is_set_up:
+            # self.time += delta_time
             self.world_camera.position = (self.player.position[0] + 100, self.player.position[1])
             self.player.update_animation(delta_time)
 
@@ -162,7 +176,7 @@ class MainMenu(MenuBackground):
         def on_click_texture_button(event):
             self.manager.disable()
             options_view = OptionView(self)
-            options_view.on_resize(self.width, self.height)
+            options_view.on_resize(int(self.width), int(self.height))
             self.window.show_view(options_view)
 
     def on_show_view(self):
@@ -220,19 +234,19 @@ class LevelSelection(MenuBackground):
         texture_normal = arcade.load_texture("assets/ui/button_normal.png")
         texture_hovered = arcade.load_texture("assets/ui/button_hover.png")
         texture_pressed = arcade.load_texture("assets/ui/button_pressed.png")
-        texture_button1 = UITextureButton(texture=texture_normal,
+        levels = sorted([i.rstrip(".tmx") for i in os.listdir("assets/levels") if i.endswith(".tmx") and i != "main_menu.tmx"])
+        if "tutorial" in levels:
+            levels.remove("tutorial")
+            levels.insert(0, "tutorial")
+        for i, level in enumerate(levels):
+            button = UITextureButton(texture=texture_normal,
                                          texture_hovered=texture_hovered,
                                          texture_pressed=texture_pressed,
-                                         text="tutorial",
+                                         text=f"{level}",
                                          scale=1.0)
-        self.box_layout.add(texture_button1)
-        texture_button = UITextureButton(texture=texture_normal,
-                                         texture_hovered=texture_hovered,
-                                         texture_pressed=texture_pressed,
-                                         text="race",
-                                         scale=1.0)
-        self.box_layout.add(texture_button)
-        spacer = UISpace(height=30,)
+            button.on_click = lambda event, val=level: self.show_game_view(val)
+            self.box_layout.add(button)
+        spacer = UISpace(height=30)
         self.box_layout.add(spacer)
         texture_button999 = UITextureButton(texture=texture_normal,
                                          texture_hovered=texture_hovered,
@@ -240,14 +254,6 @@ class LevelSelection(MenuBackground):
                                          text="Back",
                                          scale=1.0)
         self.box_layout.add(texture_button999)
-
-        @texture_button.event("on_click")
-        def on_click_texture_button(event):
-            self.show_game_view("race")
-
-        @texture_button1.event("on_click")
-        def on_click_texture_button(event):
-            self.show_game_view("tutorial")
 
         @texture_button999.event("on_click")
         def on_click_texture_button(event):
@@ -265,8 +271,8 @@ class LevelSelection(MenuBackground):
 
     def show_menu_view(self):
         self.main_menu.manager.enable()
-        self.main_menu.on_resize(self.width, self.height)
-        self.main_menu.manager.on_resize(self.width, self.height)
+        self.main_menu.on_resize(int(self.width), int(self.height))
+        self.main_menu.manager.on_resize(int(self.width), int(self.height))
         self.window.show_view(self.main_menu)
         self.manager.disable()
 
@@ -284,6 +290,7 @@ class PauseView(arcade.View):
         self.rect = arcade.rect.XYWH(self.width / 2, self.height / 2,
                                      self.width, self.height)
         self.camera.match_window(viewport=True, projection=True)
+        self.manager.on_resize(int(self.width), int(self.height))
 
     def setup(self):
         self.manager = UIManager()
@@ -333,7 +340,7 @@ class PauseView(arcade.View):
         @texture_button1.event("on_click")
         def on_click_texture_button1(event):
             self.manager.disable()
-            self.parent.on_resize(self.width, self.height)
+            self.parent.on_resize(int(self.width), int(self.height))
             self.window.show_view(self.parent)
 
         @texture_button2.event("on_click")
@@ -348,11 +355,8 @@ class PauseView(arcade.View):
         def on_click_texture_button(event):
             self.manager.disable()
             options_view = OptionView(self)
-            options_view.on_resize(self.width, self.height)
+            options_view.on_resize(int(self.width), int(self.height))
             self.window.show_view(options_view)
-
-    def on_resize(self, width, height):
-        self.manager.on_resize(self.width, self.height)
 
     def on_show(self):
         pass
@@ -370,7 +374,7 @@ class PauseView(arcade.View):
             self.window.set_fullscreen(not self.window.fullscreen)
         elif symbol == arcade.key.ESCAPE:
             self.manager.disable()
-            self.parent.on_resize(self.width, self.height)
+            self.parent.on_resize(int(self.width), int(self.height))
             self.window.show_view(self.parent)
 
 
@@ -458,8 +462,8 @@ class OptionView(arcade.View):
         def on_click_texture_button(event):
             self.manager.disable()
             self.parent.manager.enable()
-            self.parent.on_resize(self.width, self.height)
-            self.parent.manager.on_resize(self.width, self.height)
+            self.parent.on_resize(int(self.width), int(self.height))
+            self.parent.manager.on_resize(int(self.width), int(self.height))
             self.window.show_view(self.parent)
 
         @self.fullscreen_toggle.event("on_click")
@@ -488,5 +492,5 @@ class OptionView(arcade.View):
         elif symbol == arcade.key.ESCAPE:
             self.manager.disable()
             self.parent.manager.enable()
-            self.parent.manager.on_resize(self.width, self.height)
+            self.parent.manager.on_resize(int(self.width), int(self.height))
             self.window.show_view(self.parent)

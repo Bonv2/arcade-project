@@ -1,8 +1,10 @@
 import arcade
 import random
 import math
-
 import pymunk
+from arcade import SpriteList
+
+from arcade.future.light import Light, LightLayer
 from pyglet.graphics import Batch
 from typing import Tuple
 
@@ -16,10 +18,12 @@ from objects import Checkpoint, RaceEnd, Respawn, TimerDisplay, TextDisplay
 class GameView(arcade.View):
     def __init__(self) -> None:
         super().__init__()
-        self.keys_pressed = set()
+        self.keys_pressed: set = set()
         self.level: str | None = None
-        self.time = 0
-        self.freeze = True
+        self.time: float = 0
+        self.freeze: bool = True
+        self.main_menu: MainMenu | None = None
+        self.light_layer: LightLayer | None = None
         with open("assets/shaders/stars_shader.glsl", "r", encoding="utf-8") as file:
             self.stars_shader = arcade.experimental.Shadertoy((int(self.width), int(self.height)), file.read())
         self.world_camera = arcade.camera.Camera2D()
@@ -32,11 +36,16 @@ class GameView(arcade.View):
         self.level = level
         tile_map = arcade.load_tilemap(f"assets/levels/{self.level}.tmx")
 
+        self.light_layer = LightLayer(int(self.width), int(self.height))
+
         self.special_list = tile_map.sprite_lists["special"]
         self.level_end_list = arcade.SpriteList(use_spatial_hash=True)
+        self.teleporter_list = arcade.SpriteList(use_spatial_hash=True)
         self.text_displays = arcade.SpriteList()
 
         self.player: Player | None = Player(self)
+
+        special: arcade.Sprite
         for special in self.special_list:
             type = special.properties["type"]
             if type == "player_spawn":
@@ -48,14 +57,40 @@ class GameView(arcade.View):
                 self.level_end_list.append(special)
             elif type == "text_display":
                 text = special.properties["text"]
-                color = (int(i )for i in special.properties["color"].split("."))
+                color: Tuple[int, int, int, int] = tuple(int(i)for i in special.properties["color"].split("."))
+                pos = special.position
+                radius = 200
+                mode = 'soft'
+                light2 = Light(pos[0], pos[1], radius, color, mode)
+                self.light_layer.add(light2)
                 draw_screen = special.properties["draw_screen"]
                 font_size = special.properties["font_size"]
-                pos = special.position
                 size = (special.width, special.height)
                 screen = TextDisplay(pos, size, text, color, font_size, draw_screen)
                 self.text_displays.append(screen)
+            elif type == "teleporter":
+                special.send_to = special.properties["send_to"]
+                special.id = special.properties["id"]
+                color = TELEPORTER_LIGHT
+                pos = special.position
+                radius = 200
+                mode = 'soft'
+                light = Light(pos[0], pos[1], radius, color, mode)
+                self.light_layer.add(light)
+                self.teleporter_list.append(special)
 
+        self.teleporter_dict = {}
+        for teleporter1 in self.teleporter_list:
+            for teleporter2 in self.teleporter_list:
+                if teleporter1.send_to == teleporter2.id:
+                    self.teleporter_dict[teleporter1.id] = teleporter2
+
+        radius = 500
+        mode = 'soft'
+        color = PLAYER_LIGHT
+        self.player_light = Light(self.player.center_x, self.player.center_y, radius, color, mode)
+
+        self.light_layer.add(self.player_light)
 
         self.player_list = arcade.SpriteList()
         self.player_list.append(self.player)
@@ -63,11 +98,11 @@ class GameView(arcade.View):
 
 
         self.wall_list = tile_map.sprite_lists["walls"]
-        self.background_list = tile_map.sprite_lists["background"]
+        self.background_list = tile_map.sprite_lists.get("background", SpriteList(use_spatial_hash=True))
         self.collision_list = tile_map.sprite_lists["collisions"]
-        self.laser_list = tile_map.sprite_lists["lasers"]
+        self.laser_list = tile_map.sprite_lists.get("lasers", SpriteList(use_spatial_hash=True))
         self.checkpoint_list = arcade.SpriteList(use_spatial_hash=True)
-        self.platform_list = tile_map.sprite_lists["platforms"]
+        self.platform_list = tile_map.sprite_lists.get("platforms", SpriteList())
         self.end_list = arcade.SpriteList(use_spatial_hash=True)
         self.display_list = arcade.SpriteList()
 
@@ -83,19 +118,29 @@ class GameView(arcade.View):
             platform.boundary_right = right + platform.boundary_right * 64
             platform.boundary_bottom = bottom + platform.boundary_bottom * 64
 
-        displays = tile_map.sprite_lists["displays"]
+        displays = tile_map.sprite_lists.get("displays", SpriteList(use_spatial_hash=True))
         for display in displays:
             pos = display.position
             size = (display.width, display.height)
             race_id = display.properties["race_id"]
+            radius = 200
+            mode = 'soft'
+            color = DISPLAY_LIGHT
+            light1 = Light(pos[0], pos[1], radius, color, mode)
+            self.light_layer.add(light1)
             self.display_list.append(TimerDisplay(pos, size, race_id, self.level))
 
-        checkpoints = tile_map.sprite_lists["checkpoints"]
+        checkpoints = tile_map.sprite_lists.get("checkpoints", SpriteList(use_spatial_hash=True))
         for checkpoint in checkpoints:
             pos = checkpoint.position
+            radius = 150
+            mode = 'soft'
+            color = CHECKPOINT_LIGHT_OFF
+            light = Light(pos[0], pos[1], radius, color, mode)
+            self.light_layer.add(light)
             self.checkpoint_list.append(Checkpoint(pos))
 
-        ends = tile_map.sprite_lists["ends"]
+        ends = tile_map.sprite_lists.get("ends", SpriteList(use_spatial_hash=True))
         for end in ends:
             pos = end.position
             race = end.properties["race_id"]
@@ -222,28 +267,35 @@ class GameView(arcade.View):
         self.world_camera.match_window(viewport=True, projection=True)
         self.ui_camera.match_window(viewport=True, projection=True)
         self.stars_shader.resize((int(self.width), int(self.height)))
+        self.light_layer.resize(int(self.width), int(self.height))
 
     def on_draw(self) -> bool | None:
         self.clear()
 
-        self.stars_shader.render(time=self.time)
-
+        # Draw the light layer to the screen.
+        # This fills the entire screen with the lit version
+        # of what we drew into the light layer above.
         self.world_camera.use()
         if self.level is not None:
-            self.background_list.draw()
-            for display in self.display_list:
-                display.draw()
-            for display in self.text_displays:
-                display.draw()
-            self.checkpoint_list.draw()
-            for checkpoint in self.checkpoint_list:
-                checkpoint.draw()
-            self.platform_list.draw()
-            self.all_sprites.draw()
-            self.player.draw()
-            self.end_list.draw()
+            with self.light_layer:
+                self.stars_shader.render(time=self.time)
+                self.background_list.draw()
+                for display in self.display_list:
+                    display.draw()
+                for display in self.text_displays:
+                    display.draw()
+                self.checkpoint_list.draw()
+                self.teleporter_list.draw()
+                for checkpoint in self.checkpoint_list:
+                    checkpoint.draw()
+                self.platform_list.draw()
+                self.all_sprites.draw()
+                self.player.draw()
+                self.end_list.draw()
         else:
             arcade.draw_text("No level loaded!", self.width // 2, self.height // 2,)
+
+        self.light_layer.draw(ambient_color=AMBIENT_COLOR)
 
         if DEBUG_INFO:
             cam_pos = self.world_camera.position
@@ -251,7 +303,7 @@ class GameView(arcade.View):
             arcade.draw_text(f"{self.cur_race_timer:0.2f} {self.cur_race}", x=cam_pos[0] - self.width / 2, y=cam_pos[1],
                              anchor_x="left", anchor_y="center")
             box_player = arcade.rect.XYWH(*self.player.position, 200, 150)
-            mouse = self.world_to_cam(self.mouse_pos)
+            mouse = self.world_to_cam(self.mouse_pos, self.world_camera)
             arcade.draw_line(*self.player.position , *mouse, arcade.color.PUCE)
             arcade.draw_rect_outline(box_player, arcade.color.BLACK)
             arcade.draw_point(*cam_pos, arcade.color.RED, size=2)
@@ -273,11 +325,11 @@ class GameView(arcade.View):
             cam_y = arcade.math.lerp(old_y, cam_y, 0.22)
         self.world_camera.position = (cam_x, cam_y)
 
-    def update_non_phys_collisions(self): # all that uses collision but not physics, todo: maybe use pymunk sensors somehow (that should improve performance if i will need it)
+    def update_non_phys_collisions(self): # all that uses collision but not physics, todo: maybe use pymunk sensors somehow (that should improve performance IF i will need it)
         checkpoints_collisions = arcade.check_for_collision_with_list(self.player, self.checkpoint_list)
         checkpoint: Checkpoint
         for checkpoint in checkpoints_collisions:
-            if not checkpoint.active:
+            if not checkpoint.active and self.cur_race is None:
                 checkpoint.activate()
                 self.cur_checkpoint = checkpoint
                 for ccheckpoint in self.checkpoint_list:
@@ -306,12 +358,22 @@ class GameView(arcade.View):
             level_end = level_end_collision[0]
             if level_end.send_to == "menu":
                 self.main_menu.manager.enable()
-                self.main_menu.on_resize(self.width, self.height)
+                self.main_menu.on_resize(int(self.width), int(self.height))
                 self.main_menu.manager.on_resize(self.width, self.height)
                 self.window.show_view(self.main_menu)
                 self.level = None
             else:
                 self.setup(level_end.send_to)
+
+        teleporter_collision = arcade.check_for_collision_with_list(self.player, self.teleporter_list)
+        if teleporter_collision:
+            teleporter = teleporter_collision[0]
+            id = teleporter.id
+            send_to = self.teleporter_dict.get(id, None)
+            if send_to is not None:
+                self.physics_engine.set_position(self.player, send_to.position)
+                sound = arcade.Sound("assets/sounds/teleporter.wav")
+                sound.play(loop=False, volume=0.5 * read_settings().get("volume", 100) / 100)
 
     def unique_race_triggers(self, race_id: int):  # this is for handling triggers upon race completion (not used)
         pass
@@ -347,6 +409,8 @@ class GameView(arcade.View):
         self.physics_engine.step(1 / 120)
         self.update_platforms(1 / 120)
         self.time += delta_time
+
+        self.player_light.position = self.player.position
 
         self.update_world_camera()
         self.update_non_phys_collisions()
@@ -395,7 +459,7 @@ class GameView(arcade.View):
             self.window.set_fullscreen(fullscreen)
         elif symbol == arcade.key.ESCAPE:
             pause_view = PauseView(self)
-            pause_view.on_resize(self.width, self.height)
+            pause_view.on_resize(int(self.width), int(self.height))
             self.window.show_view(pause_view)
         elif symbol not in self.keys_pressed:
             self.keys_pressed.add(symbol)

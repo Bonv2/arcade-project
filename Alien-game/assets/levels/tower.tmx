@@ -1,0 +1,561 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="61" height="85" tilewidth="64" tileheight="64" infinite="0" nextlayerid="10" nextobjectid="214">
+ <tileset firstgid="1" source="alien.tsx"/>
+ <layer id="3" name="background" width="61" height="85">
+  <data encoding="base64" compression="zlib">
+   eJztm81uwyAMx3mqqqeNrZelay9dt77/mwxLtWRZ2MCBJnb8k6xKARL+MZivNKUgCIIgCN6KvTcsF1tWqt8Mvop9FPsU7FTsnPxp/i52YXZ8/l6TX81HYlS3Z8178/NvsT/BHsmf5luxn4bdV6vdHMB/h6ctyZc/JXrHZ09Af0ZfL8zw2nm12s0BNWvmTfMeYxiF+3cv7FWvJd20riP1hny1MSsP3mONdyXFXS0/apXK9mjXYv5sRp6NemkeXEefKuVz5T6tMW629tFngl6uEddX1yS/i5FnzvbzqI/pGhI14vrqwcrj+vpaud+a7Vp7PgfnXpJGbjRf7nzmK2PZiGbJtH7N56Fb1FyDaq7pk/p1r+YtQjXzvtpq81bXG1Rzb59Gs7re0Ppzqy9vte220DTztk7fgdV2DWgxjLd1Hs+swmOYFKP5O7C8NzYawzzsmdT6s7YvZGH8bcH3wFCXBKQdyK8XQE/PXrdVP0O9a3q0c2jr45V0zk7PI7UzSou0ziJbZ5QW0fbxe+K4ZTAO03PJnjSLaPE5d6RbRIphGJdb6RaRviHBuNxKtwj9Vmhvmvfo59AcmkOzD821+TbOp1vpFtHm2/eOdIvA3DKnsTk07inkCfV5BdB2sY3yb5iRC0vj5azBNWOM4tA9A17OGjXNtf2iJfnTjP15eV6j33wehDweNKNO3POGNSSe49TyWNUMYxGMOdSvuGaGcRnGYfp/G9SN5TzQ07Y9UpuHePFpEARBEARBEARBEARBEGyVf23Z8RQ=
+  </data>
+ </layer>
+ <objectgroup id="9" name="displays">
+  <object id="38" gid="76" x="1888" y="1184" width="320" height="192">
+   <properties>
+    <property name="race_id" type="int" value="0"/>
+   </properties>
+  </object>
+  <object id="39" gid="76" x="832" y="1728" width="320" height="192">
+   <properties>
+    <property name="race_id" type="int" value="1"/>
+   </properties>
+  </object>
+  <object id="40" gid="76" x="2720" y="1728" width="320" height="192">
+   <properties>
+    <property name="race_id" type="int" value="1"/>
+   </properties>
+  </object>
+ </objectgroup>
+ <objectgroup id="8" name="checkpoints">
+  <object id="12" gid="50" x="1888" y="4032" width="64" height="64"/>
+  <object id="13" gid="50" x="1792" y="1216" width="64" height="64"/>
+  <object id="41" gid="50" x="2944" y="1856" width="64" height="64"/>
+  <object id="42" gid="50" x="896" y="1856" width="64" height="64"/>
+ </objectgroup>
+ <objectgroup id="7" name="ends">
+  <object id="6" gid="40" x="1664" y="3968" width="64" height="64">
+   <properties>
+    <property name="race_id" type="int" value="0"/>
+    <property name="type" value="start"/>
+   </properties>
+  </object>
+  <object id="7" gid="40" x="1664" y="4032" width="64" height="64">
+   <properties>
+    <property name="race_id" type="int" value="0"/>
+    <property name="type" value="start"/>
+   </properties>
+  </object>
+  <object id="8" gid="40" x="2112" y="4032" width="64" height="64">
+   <properties>
+    <property name="race_id" type="int" value="0"/>
+    <property name="type" value="start"/>
+   </properties>
+  </object>
+  <object id="9" gid="40" x="2112" y="3968" width="64" height="64">
+   <properties>
+    <property name="race_id" type="int" value="0"/>
+    <property name="type" value="start"/>
+   </properties>
+  </object>
+  <object id="10" gid="40" x="1856" y="1280" width="64" height="64">
+   <properties>
+    <property name="race_id" type="int" value="0"/>
+    <property name="type" value="end"/>
+   </properties>
+  </object>
+  <object id="11" gid="40" x="1920" y="1280" width="64" height="64">
+   <properties>
+    <property name="race_id" type="int" value="0"/>
+    <property name="type" value="end"/>
+   </properties>
+  </object>
+  <object id="15" gid="40" x="2240" y="768" width="64" height="64">
+   <properties>
+    <property name="race_id" type="int" value="1"/>
+    <property name="type" value="start"/>
+   </properties>
+  </object>
+  <object id="16" gid="40" x="2240" y="704" width="64" height="64">
+   <properties>
+    <property name="race_id" type="int" value="1"/>
+    <property name="type" value="start"/>
+   </properties>
+  </object>
+  <object id="17" gid="40" x="2240" y="640" width="64" height="64">
+   <properties>
+    <property name="race_id" type="int" value="1"/>
+    <property name="type" value="start"/>
+   </properties>
+  </object>
+  <object id="18" gid="40" x="2240" y="576" width="64" height="64">
+   <properties>
+    <property name="race_id" type="int" value="1"/>
+    <property name="type" value="start"/>
+   </properties>
+  </object>
+  <object id="19" gid="40" x="2240" y="512" width="64" height="64">
+   <properties>
+    <property name="race_id" type="int" value="1"/>
+    <property name="type" value="start"/>
+   </properties>
+  </object>
+  <object id="20" gid="40" x="768" y="1344" width="64" height="64">
+   <properties>
+    <property name="race_id" type="int" value="1"/>
+    <property name="type" value="end"/>
+   </properties>
+  </object>
+  <object id="21" gid="40" x="768" y="1408" width="64" height="64">
+   <properties>
+    <property name="race_id" type="int" value="1"/>
+    <property name="type" value="end"/>
+   </properties>
+  </object>
+  <object id="22" gid="40" x="768" y="1472" width="64" height="64">
+   <properties>
+    <property name="race_id" type="int" value="1"/>
+    <property name="type" value="end"/>
+   </properties>
+  </object>
+  <object id="23" gid="40" x="768" y="1536" width="64" height="64">
+   <properties>
+    <property name="race_id" type="int" value="1"/>
+    <property name="type" value="end"/>
+   </properties>
+  </object>
+  <object id="24" gid="40" x="768" y="1600" width="64" height="64">
+   <properties>
+    <property name="race_id" type="int" value="1"/>
+    <property name="type" value="end"/>
+   </properties>
+  </object>
+  <object id="25" gid="40" x="768" y="1664" width="64" height="64">
+   <properties>
+    <property name="race_id" type="int" value="1"/>
+    <property name="type" value="end"/>
+   </properties>
+  </object>
+  <object id="26" gid="40" x="768" y="1728" width="64" height="64">
+   <properties>
+    <property name="race_id" type="int" value="1"/>
+    <property name="type" value="end"/>
+   </properties>
+  </object>
+  <object id="27" gid="40" x="768" y="1792" width="64" height="64">
+   <properties>
+    <property name="race_id" type="int" value="1"/>
+    <property name="type" value="end"/>
+   </properties>
+  </object>
+  <object id="28" gid="40" x="768" y="1856" width="64" height="64">
+   <properties>
+    <property name="race_id" type="int" value="1"/>
+    <property name="type" value="end"/>
+   </properties>
+  </object>
+  <object id="29" gid="40" x="3072" y="1344" width="64" height="64">
+   <properties>
+    <property name="race_id" type="int" value="1"/>
+    <property name="type" value="end"/>
+   </properties>
+  </object>
+  <object id="30" gid="40" x="3072" y="1408" width="64" height="64">
+   <properties>
+    <property name="race_id" type="int" value="1"/>
+    <property name="type" value="end"/>
+   </properties>
+  </object>
+  <object id="31" gid="40" x="3072" y="1472" width="64" height="64">
+   <properties>
+    <property name="race_id" type="int" value="1"/>
+    <property name="type" value="end"/>
+   </properties>
+  </object>
+  <object id="32" gid="40" x="3072" y="1536" width="64" height="64">
+   <properties>
+    <property name="race_id" type="int" value="1"/>
+    <property name="type" value="end"/>
+   </properties>
+  </object>
+  <object id="33" gid="40" x="3072" y="1600" width="64" height="64">
+   <properties>
+    <property name="race_id" type="int" value="1"/>
+    <property name="type" value="end"/>
+   </properties>
+  </object>
+  <object id="34" gid="40" x="3072" y="1664" width="64" height="64">
+   <properties>
+    <property name="race_id" type="int" value="1"/>
+    <property name="type" value="end"/>
+   </properties>
+  </object>
+  <object id="35" gid="40" x="3072" y="1728" width="64" height="64">
+   <properties>
+    <property name="race_id" type="int" value="1"/>
+    <property name="type" value="end"/>
+   </properties>
+  </object>
+  <object id="36" gid="40" x="3072" y="1792" width="64" height="64">
+   <properties>
+    <property name="race_id" type="int" value="1"/>
+    <property name="type" value="end"/>
+   </properties>
+  </object>
+  <object id="37" gid="40" x="3072" y="1856" width="64" height="64">
+   <properties>
+    <property name="race_id" type="int" value="1"/>
+    <property name="type" value="end"/>
+   </properties>
+  </object>
+ </objectgroup>
+ <objectgroup id="6" name="platforms">
+  <object id="2" gid="32" x="1408" y="2688" width="128" height="64">
+   <properties>
+    <property name="boundary_bottom" type="float" value="0"/>
+    <property name="boundary_left" type="float" value="0"/>
+    <property name="boundary_right" type="float" value="14"/>
+    <property name="boundary_top" type="float" value="0"/>
+    <property name="change_x" type="float" value="3"/>
+    <property name="change_y" type="float" value="0"/>
+   </properties>
+  </object>
+  <object id="5" gid="32" x="1856" y="1728" width="128" height="64">
+   <properties>
+    <property name="boundary_bottom" type="float" value="-1"/>
+    <property name="boundary_left" type="float" value="0"/>
+    <property name="boundary_right" type="float" value="0"/>
+    <property name="boundary_top" type="float" value="7"/>
+    <property name="change_x" type="float" value="0"/>
+    <property name="change_y" type="float" value="3.5"/>
+   </properties>
+  </object>
+  <object id="198" gid="32" x="2240" y="3808" width="128" height="32">
+   <properties>
+    <property name="boundary_bottom" type="float" value="0"/>
+    <property name="boundary_left" type="float" value="0"/>
+    <property name="boundary_right" type="float" value="0"/>
+    <property name="boundary_top" type="float" value="0"/>
+    <property name="change_x" type="float" value="0"/>
+    <property name="change_y" type="float" value="0"/>
+   </properties>
+  </object>
+  <object id="199" gid="32" x="1472" y="3808" width="128" height="32">
+   <properties>
+    <property name="boundary_bottom" type="float" value="0"/>
+    <property name="boundary_left" type="float" value="0"/>
+    <property name="boundary_right" type="float" value="0"/>
+    <property name="boundary_top" type="float" value="0"/>
+    <property name="change_x" type="float" value="0"/>
+    <property name="change_y" type="float" value="0"/>
+   </properties>
+  </object>
+  <object id="201" gid="32" x="1344" y="3680" width="128" height="32">
+   <properties>
+    <property name="boundary_bottom" type="float" value="0"/>
+    <property name="boundary_left" type="float" value="0"/>
+    <property name="boundary_right" type="float" value="0"/>
+    <property name="boundary_top" type="float" value="0"/>
+    <property name="change_x" type="float" value="0"/>
+    <property name="change_y" type="float" value="0"/>
+   </properties>
+  </object>
+  <object id="203" gid="32" x="2368" y="3680" width="128" height="32">
+   <properties>
+    <property name="boundary_bottom" type="float" value="0"/>
+    <property name="boundary_left" type="float" value="0"/>
+    <property name="boundary_right" type="float" value="0"/>
+    <property name="boundary_top" type="float" value="0"/>
+    <property name="change_x" type="float" value="0"/>
+    <property name="change_y" type="float" value="0"/>
+   </properties>
+  </object>
+ </objectgroup>
+ <layer id="2" name="lasers" width="61" height="85">
+  <data encoding="base64" compression="zlib">
+   eJzt2EEKgzAQBVDvpC5dd+39L1NL6bJgic1nzHuQ5cT5kAySaQIAAACAc+ZjLSfX+uf9r/geAAD1bekGAh7pBgJkHoPMY5D57dsbyF3eN16Z75iL61T9h2vpu+r8a+m7cuZfZ9dnrlfNPKKW+1x1ho14n/dQbZKz3a82ydnuV5vkbPerBQAAAAAAACDjCRZtEg4=
+  </data>
+ </layer>
+ <layer id="1" name="walls" width="61" height="85">
+  <data encoding="base64" compression="zlib">
+   eJztm1Fv1DAMx7PBkICxFxgDTtrMgIcbQ3uZhMTnue//GWjERQ0+O7EbN03u+pOitqnPzb9JnbTJOdceH4d0s0+fKl/7uvL1OPw9qKX9rtJ1pMB+O+c9WFIzp2vutred2T8H7LfX7lDjNzfeC3A8qXMSe+3vLcH3HR9D5lgDoO1UPrsxBudSrv6A2beE8hv3I7mye6xiQit9iIQpmoHI22bOt4RFPQOzn8qbYmNFqWZQ5rdAiWYQ5uF8zqYWGs1xnAJm3wnyl0ajOWcLaNsqlA6uv/vB+ADhtYDZr02sGYS2KTvqXM5vbSzbdi/E7wQ5rMYvVF5NSuoZBPst8ntIb6N0H537is79qV46W4KeqyE9ROkssjlH5965w/syFTDwocHrxVpfDOlySI+R3c993kt3qF2jG4pLXAbWS2nFUNq1upeC0pvSivHap+oGZn9u4udTqzeAdZ+lzRcF13FJWeN713Ibt6jjgEVdQ8H1Jezc/5ot2iP2tzPwaYlEs3+X2ih81taMx0eSJHmWNXME+JnWlkcbA/DzpE2ptg2J4/g7CR6jaZJVn2GlOcUvN76DTdVsET8vhcmyT+XGcpJUoleLZdzGddzquCSlGRR+fHx/4/oYi0nrGYz9LcmUMoKxv9qUlhHPO/ao+ZmwSc1FP2X8tQgeN713/7R8ibZYF4ePY69cX5rjccEWbaf460HzHO9VLbJqpmNYwI8tU+89z4S/FonLeOH49ZphnPWaORd+11sMO9W2HSNZ53QMY5KAb6/fXXpukrLpWbNH0jdjm941Y3JxW+tvKaRlTMXtKf6WZI3bI5J2TNn1rNl/R8y149De4+93PWtuxd8crHF7hPo24sfSF0T+RuCvJbgyUmulzh2t4w7Z9K751o11HvrnULe3yDblryVymr1e6nuYn6PaINuUv5bgyug1Ud81XcamN80+PpX8t6/H756n2D9T6wLwOs/Uuk/puoWlyc2R4/EoN87M/bYluPn5MKca5jY+uLEuw3GoU25uveY8ugXxvXgUHPdM/IzeTzjuERx3tcc9guP4leK4R83UmnVNanldK0fJerZe6/oUNWvW0rWwtg2zc+2tI56bY9QsWbfcWwzNIYk3vcWTHKeoWRJjex/7r6ysrBwTfwHGX2OA
+  </data>
+ </layer>
+ <objectgroup id="5" name="special">
+  <object id="43" gid="30" x="1888" y="4032" width="64" height="64">
+   <properties>
+    <property name="type" value="player_spawn"/>
+   </properties>
+  </object>
+  <object id="44" gid="30" x="1088" y="1856" width="64" height="128">
+   <properties>
+    <property name="send_to" value="menu"/>
+    <property name="type" value="level_end"/>
+   </properties>
+  </object>
+  <object id="45" gid="30" x="2688" y="1856" width="64" height="128">
+   <properties>
+    <property name="send_to" value="menu"/>
+    <property name="type" value="level_end"/>
+   </properties>
+  </object>
+  <object id="46" gid="30" x="512" y="4864" width="128" height="128">
+   <properties>
+    <property name="send_to" value="main_menu"/>
+    <property name="type" value="level_end"/>
+   </properties>
+  </object>
+  <object id="47" gid="30" x="-128" y="4864" width="128" height="192">
+   <properties>
+    <property name="color" value="255.0.0.255"/>
+    <property name="draw_screen" type="bool" value="true"/>
+    <property name="font_size" type="int" value="60"/>
+    <property name="text" value="ERROR"/>
+    <property name="type" value="text_display"/>
+   </properties>
+  </object>
+  <object id="188" gid="30" x="1856" y="2688" width="128" height="64">
+   <properties>
+    <property name="color" value="255.0.0.255"/>
+    <property name="draw_screen" type="bool" value="true"/>
+    <property name="font_size" type="int" value="19"/>
+    <property name="text" value="keep going"/>
+    <property name="type" value="text_display"/>
+   </properties>
+  </object>
+  <object id="189" gid="30" x="1472" y="2368" width="128" height="64">
+   <properties>
+    <property name="color" value="255.0.0.255"/>
+    <property name="draw_screen" type="bool" value="false"/>
+    <property name="font_size" type="int" value="30"/>
+    <property name="text" value=""/>
+    <property name="type" value="text_display"/>
+   </properties>
+  </object>
+  <object id="190" gid="30" x="2176" y="2048" width="128" height="64">
+   <properties>
+    <property name="color" value="255.0.0.255"/>
+    <property name="draw_screen" type="bool" value="false"/>
+    <property name="font_size" type="int" value="30"/>
+    <property name="text" value=""/>
+    <property name="type" value="text_display"/>
+   </properties>
+  </object>
+  <object id="191" gid="30" x="1664" y="1600" width="128" height="64">
+   <properties>
+    <property name="color" value="255.0.0.255"/>
+    <property name="draw_screen" type="bool" value="false"/>
+    <property name="font_size" type="int" value="30"/>
+    <property name="text" value=""/>
+    <property name="type" value="text_display"/>
+   </properties>
+  </object>
+  <object id="192" gid="30" x="1792" y="2112" width="128" height="64">
+   <properties>
+    <property name="color" value="255.0.0.255"/>
+    <property name="draw_screen" type="bool" value="false"/>
+    <property name="font_size" type="int" value="30"/>
+    <property name="text" value=""/>
+    <property name="type" value="text_display"/>
+   </properties>
+  </object>
+  <object id="193" gid="30" x="2112" y="1664" width="128" height="64">
+   <properties>
+    <property name="color" value="255.0.0.255"/>
+    <property name="draw_screen" type="bool" value="false"/>
+    <property name="font_size" type="int" value="30"/>
+    <property name="text" value=""/>
+    <property name="type" value="text_display"/>
+   </properties>
+  </object>
+  <object id="194" gid="30" x="1472" y="1984" width="128" height="64">
+   <properties>
+    <property name="color" value="255.0.0.255"/>
+    <property name="draw_screen" type="bool" value="false"/>
+    <property name="font_size" type="int" value="30"/>
+    <property name="text" value=""/>
+    <property name="type" value="text_display"/>
+   </properties>
+  </object>
+  <object id="195" gid="30" x="2240" y="2432" width="128" height="64">
+   <properties>
+    <property name="color" value="255.0.0.255"/>
+    <property name="draw_screen" type="bool" value="false"/>
+    <property name="font_size" type="int" value="30"/>
+    <property name="text" value=""/>
+    <property name="type" value="text_display"/>
+   </properties>
+  </object>
+  <object id="196" gid="30" x="1408" y="4032" width="128" height="128">
+   <properties>
+    <property name="color" value="0.128.0.255"/>
+    <property name="draw_screen" type="bool" value="false"/>
+    <property name="font_size" type="int" value="30"/>
+    <property name="text" value=""/>
+    <property name="type" value="text_display"/>
+   </properties>
+  </object>
+  <object id="197" gid="30" x="2304" y="4032" width="128" height="128">
+   <properties>
+    <property name="color" value="0.128.0.255"/>
+    <property name="draw_screen" type="bool" value="false"/>
+    <property name="font_size" type="int" value="30"/>
+    <property name="text" value=""/>
+    <property name="type" value="text_display"/>
+   </properties>
+  </object>
+  <object id="206" gid="39" x="1600" y="2176" width="64" height="64">
+   <properties>
+    <property name="draw" type="bool" value="true"/>
+    <property name="id" type="int" value="0"/>
+    <property name="send_to" type="int" value="1"/>
+    <property name="type" value="teleporter"/>
+   </properties>
+  </object>
+  <object id="207" gid="39" x="2304" y="1984" width="64" height="64">
+   <properties>
+    <property name="draw" type="bool" value="true"/>
+    <property name="id" type="int" value="1"/>
+    <property name="send_to" type="int" value="-1"/>
+    <property name="type" value="teleporter"/>
+   </properties>
+  </object>
+ </objectgroup>
+ <objectgroup id="4" name="collisions" opacity="0.15">
+  <object id="48" gid="100" x="1152" y="4224" width="576" height="192"/>
+  <object id="49" gid="100" x="2112" y="4224" width="576" height="192"/>
+  <object id="50" gid="100" x="1728" y="4288" width="384" height="128"/>
+  <object id="51" gid="100" x="1856" y="4160" width="128" height="128"/>
+  <object id="52" gid="100" x="1536" y="4288" width="192" height="64"/>
+  <object id="53" gid="100" x="2112" y="4288" width="192" height="64"/>
+  <object id="54" gid="100" x="1408" y="4736" width="1024" height="448"/>
+  <object id="55" gid="100" x="1344" y="4736" width="64" height="256"/>
+  <object id="56" gid="100" x="2432" y="4736" width="64" height="256"/>
+  <object id="57" gid="100" x="2432" y="4032" width="256" height="2432"/>
+  <object id="58" gid="100" x="1152" y="4032" width="256" height="2432"/>
+  <object id="59" gid="100" x="1408" y="3968" width="64" height="64"/>
+  <object id="62" gid="100" x="2368" y="3968" width="64" height="64"/>
+  <object id="63" gid="100" x="2112" y="3904" width="192" height="64"/>
+  <object id="64" gid="100" x="2048" y="3840" width="128" height="64"/>
+  <object id="65" gid="100" x="1728" y="3776" width="384" height="64"/>
+  <object id="66" gid="100" x="1664" y="3840" width="128" height="64"/>
+  <object id="67" gid="100" x="1536" y="3904" width="192" height="64"/>
+  <object id="68" gid="100" x="1536" y="3648" width="320" height="64"/>
+  <object id="69" gid="100" x="1536" y="3840" width="64" height="192"/>
+  <object id="70" gid="100" x="1984" y="3648" width="320" height="64"/>
+  <object id="71" gid="100" x="1856" y="3712" width="128" height="192"/>
+  <object id="72" gid="100" x="2240" y="3840" width="64" height="192"/>
+  <object id="73" gid="100" x="2176" y="3456" width="128" height="128"/>
+  <object id="74" gid="100" x="2112" y="3456" width="64" height="64"/>
+  <object id="75" gid="100" x="1664" y="3456" width="64" height="64"/>
+  <object id="76" gid="100" x="1536" y="3456" width="128" height="128"/>
+  <object id="77" gid="100" x="1792" y="3264" width="256" height="64"/>
+  <object id="78" gid="100" x="1856" y="3200" width="128" height="64"/>
+  <object id="79" gid="100" x="1536" y="3072" width="192" height="64"/>
+  <object id="80" gid="100" x="1600" y="3136" width="64" height="192"/>
+  <object id="81" gid="100" x="2176" y="3136" width="64" height="192"/>
+  <object id="82" gid="100" x="2112" y="3072" width="192" height="64"/>
+  <object id="83" gid="100" x="1408" y="2880" width="192" height="64"/>
+  <object id="84" gid="100" x="2240" y="2880" width="192" height="64"/>
+  <object id="85" gid="100" x="1792" y="2880" width="256" height="64"/>
+  <object id="86" gid="100" x="1856" y="2816" width="128" height="64"/>
+  <object id="87" gid="100" x="1408" y="2560" width="384" height="64"/>
+  <object id="88" gid="100" x="1408" y="2624" width="64" height="64"/>
+  <object id="89" gid="100" x="1536" y="2624" width="64" height="64"/>
+  <object id="90" gid="100" x="1664" y="2624" width="64" height="64"/>
+  <object id="91" gid="100" x="1728" y="2496" width="512" height="64"/>
+  <object id="92" gid="100" x="2176" y="2432" width="64" height="64"/>
+  <object id="93" gid="100" x="2368" y="2560" width="64" height="64"/>
+  <object id="94" gid="100" x="2304" y="2240" width="64" height="64"/>
+  <object id="95" gid="100" x="2368" y="2240" width="64" height="192"/>
+  <object id="96" gid="100" x="1984" y="2368" width="64" height="64"/>
+  <object id="97" gid="100" x="1792" y="2304" width="64" height="64"/>
+  <object id="98" gid="100" x="1600" y="2240" width="64" height="64"/>
+  <object id="99" gid="100" x="2240" y="2048" width="128" height="64"/>
+  <object id="104" gid="100" x="1408" y="1728" width="64" height="128"/>
+  <object id="105" gid="100" x="2368" y="1728" width="64" height="128"/>
+  <object id="106" gid="100" x="2304" y="1600" width="320" height="64"/>
+  <object id="107" gid="100" x="2240" y="1536" width="384" height="64"/>
+  <object id="108" gid="100" x="2112" y="1472" width="448" height="64"/>
+  <object id="109" gid="100" x="1984" y="1408" width="512" height="64"/>
+  <object id="110" gid="100" x="1984" y="1344" width="320" height="128"/>
+  <object id="111" gid="100" x="2304" y="1344" width="128" height="64"/>
+  <object id="112" gid="100" x="1408" y="1344" width="128" height="64"/>
+  <object id="113" gid="100" x="1536" y="1344" width="320" height="128"/>
+  <object id="114" gid="100" x="1344" y="1408" width="512" height="64"/>
+  <object id="115" gid="100" x="1280" y="1472" width="448" height="64"/>
+  <object id="116" gid="100" x="1216" y="1536" width="384" height="64"/>
+  <object id="117" gid="100" x="1216" y="1600" width="320" height="64"/>
+  <object id="118" gid="100" x="320" y="1984" width="832" height="128"/>
+  <object id="119" gid="100" x="384" y="2048" width="768" height="64"/>
+  <object id="120" gid="100" x="448" y="2112" width="704" height="64"/>
+  <object id="121" gid="100" x="2688" y="1984" width="832" height="128"/>
+  <object id="122" gid="100" x="2688" y="2048" width="768" height="64"/>
+  <object id="123" gid="100" x="2688" y="2112" width="704" height="64"/>
+  <object id="124" gid="100" x="0" y="5120" width="640" height="256"/>
+  <object id="125" gid="100" x="1536" y="448" width="768" height="64"/>
+  <object id="126" gid="100" x="1536" y="1216" width="64" height="768"/>
+  <object id="127" gid="100" x="1856" y="960" width="384" height="64"/>
+  <object id="128" gid="100" x="2240" y="1216" width="64" height="448"/>
+  <object id="129" gid="100" x="1728" y="1024" width="64" height="64"/>
+  <object id="130" gid="100" x="1600" y="1152" width="64" height="64"/>
+  <object id="131" gid="100" x="704" y="512" width="704" height="64"/>
+  <object id="132" gid="100" x="448" y="512" width="64" height="64"/>
+  <object id="133" gid="100" x="512" y="448" width="64" height="64"/>
+  <object id="134" gid="100" x="576" y="384" width="64" height="64"/>
+  <object id="135" gid="100" x="384" y="448" width="64" height="64"/>
+  <object id="136" gid="100" x="320" y="384" width="64" height="64"/>
+  <object id="137" gid="100" x="448" y="320" width="64" height="256"/>
+  <object id="138" gid="100" x="2368" y="1024" width="64" height="64"/>
+  <object id="139" gid="100" x="2496" y="1216" width="64" height="64"/>
+  <object id="140" gid="100" x="2688" y="1216" width="64" height="64"/>
+  <object id="141" gid="100" x="2880" y="1216" width="64" height="64"/>
+  <object id="142" gid="100" x="3072" y="1152" width="64" height="64"/>
+  <object id="143" gid="100" x="3136" y="1024" width="64" height="64"/>
+  <object id="144" gid="100" x="2816" y="1024" width="64" height="64"/>
+  <object id="145" gid="100" x="2624" y="960" width="64" height="64"/>
+  <object id="146" gid="100" x="2432" y="832" width="64" height="64"/>
+  <object id="147" gid="100" x="2624" y="832" width="64" height="64"/>
+  <object id="148" gid="100" x="2496" y="768" width="64" height="64"/>
+  <object id="149" gid="100" x="2560" y="704" width="64" height="64"/>
+  <object id="150" gid="100" x="2624" y="640" width="64" height="64"/>
+  <object id="151" gid="100" x="2688" y="576" width="64" height="128"/>
+  <object id="152" gid="100" x="2368" y="576" width="64" height="64"/>
+  <object id="153" gid="100" x="2368" y="448" width="64" height="64"/>
+  <object id="154" gid="100" x="2368" y="320" width="64" height="64"/>
+  <object id="155" gid="100" x="2432" y="256" width="128" height="64"/>
+  <object id="156" gid="100" x="2560" y="384" width="64" height="128"/>
+  <object id="157" gid="100" x="2368" y="64" width="256" height="64"/>
+  <object id="158" gid="100" x="2624" y="128" width="128" height="64"/>
+  <object id="159" gid="100" x="2752" y="192" width="64" height="64"/>
+  <object id="160" gid="100" x="2816" y="384" width="64" height="192"/>
+  <object id="161" gid="100" x="2752" y="448" width="64" height="64"/>
+  <object id="162" gid="100" x="2880" y="320" width="64" height="64"/>
+  <object id="163" gid="100" x="2880" y="192" width="128" height="64"/>
+  <object id="164" gid="100" x="3008" y="320" width="64" height="64"/>
+  <object id="165" gid="100" x="3072" y="384" width="64" height="64"/>
+  <object id="166" gid="100" x="2944" y="448" width="64" height="64"/>
+  <object id="167" gid="100" x="2880" y="576" width="64" height="64"/>
+  <object id="168" gid="100" x="2816" y="640" width="64" height="64"/>
+  <object id="169" gid="100" x="2816" y="768" width="64" height="64"/>
+  <object id="170" gid="100" x="2752" y="896" width="64" height="64"/>
+  <object id="171" gid="100" x="2880" y="896" width="64" height="64"/>
+  <object id="172" gid="100" x="3008" y="832" width="64" height="64"/>
+  <object id="173" gid="100" x="2944" y="704" width="64" height="64"/>
+  <object id="174" gid="100" x="3136" y="640" width="64" height="64"/>
+  <object id="175" gid="100" x="3328" y="384" width="64" height="64"/>
+  <object id="176" gid="100" x="3456" y="320" width="64" height="64"/>
+  <object id="177" gid="100" x="3712" y="640" width="64" height="64"/>
+  <object id="178" gid="100" x="3392" y="768" width="64" height="64"/>
+  <object id="179" gid="100" x="3200" y="768" width="64" height="64"/>
+  <object id="180" gid="100" x="3264" y="960" width="64" height="64"/>
+  <object id="181" gid="100" x="3456" y="960" width="64" height="64"/>
+  <object id="182" gid="100" x="3392" y="1152" width="64" height="64"/>
+  <object id="183" gid="100" x="3456" y="1344" width="64" height="64"/>
+  <object id="184" gid="100" x="3392" y="1536" width="64" height="64"/>
+  <object id="185" gid="100" x="3200" y="1536" width="64" height="64"/>
+  <object id="186" gid="100" x="3136" y="1408" width="64" height="64"/>
+  <object id="187" gid="100" x="3456" y="1728" width="64" height="64"/>
+  <object id="208" gid="100" x="2240" y="1984" width="64" height="64"/>
+  <object id="210" gid="100" x="1664" y="1856" width="128" height="64"/>
+  <object id="211" gid="100" x="1728" y="1920" width="64" height="64"/>
+  <object id="212" gid="100" x="1792" y="1984" width="64" height="64"/>
+  <object id="213" gid="100" x="2048" y="1984" width="64" height="64"/>
+ </objectgroup>
+</map>

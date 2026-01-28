@@ -155,7 +155,7 @@ class TimerDisplay(arcade.Sprite):
         for i, digit in enumerate(self.digits):
             digit.text = strin[i]
 
-    def save_best_time(self) -> None: # the raceend object should be doing this, this is bad
+    def save_best_time(self) -> None: # the raceend object should be doing this todo: change this one day
         ok = self.get_best_times_dict()
         ok[self.race_id] = self.best_time
         ok = [f"{i};{ok[i]}\n" for i in ok.keys()]
@@ -227,7 +227,7 @@ class TextDisplay(arcade.Sprite):
                                            x=self.center_x, y=self.center_y,
                                            anchor_x="center", anchor_y="center",
                                            color=color, font_size=font_size,
-                                           batch=self.batch, width=self.width, height=self.height,
+                                           batch=self.batch, width=int(self.width), height=int(self.height),
                                      multiline=True)
 
     def draw(self) -> None:
