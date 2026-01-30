@@ -492,7 +492,7 @@ class GameView(arcade.View):
 
 
 if __name__ == "__main__":
-    game = arcade.Window(SCREEN_WIDTH, SCREEN_HEIGHT, "Alien game", resizable=True)
+    game = arcade.Window(SCREEN_WIDTH, SCREEN_HEIGHT, "Alien game", resizable=True, vsync=True)
     game_view = GameView()
     main_menu = MainMenu(game_view)
     game_view.main_menu = main_menu

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="61" height="85" tilewidth="64" tileheight="64" infinite="0" nextlayerid="10" nextobjectid="214">
+<map version="1.10" tiledversion="2026.01.10" orientation="orthogonal" renderorder="right-down" width="61" height="85" tilewidth="64" tileheight="64" infinite="0" nextlayerid="10" nextobjectid="215">
  <tileset firstgid="1" source="alien.tsx"/>
  <layer id="3" name="background" width="61" height="85">
   <data encoding="base64" compression="zlib">
@@ -274,7 +274,7 @@
  </layer>
  <layer id="1" name="walls" width="61" height="85">
   <data encoding="base64" compression="zlib">
-   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
+   eJztm21v1DAMx7PBkICxNzwMOGkzA14cDO3NJCQ+z33/z8BFXNTg2YmduGly158UtU19bv5N6qRNzrn++LBP14f0sfG13ze+Hoe/B6203za6jhQ4bOe8B0tq5nTN3fa2M/vngGgfa/zqpnsBjid1TmKv/b0l+L7jY8gcawC0LeWTm2JwLuXqD5h9Syi/cT+SK7vHKib00odIKNEMRN42c74nLOoZmP1UXomNFbWaQZnfAzWaQZiH8zmbVmg0x3EKmH0nyF8ajeacLaBtr1A6uP7uO+MDhNcCZr81sWYQ2qbsqHM5v62xbNujEL8T5LAav1B5LampZxDs98jvfXodpbvo3Bd07k/z0tkS9Fzt048onUU25+jcG/f0vpQCBj40eL1Y67N9utyn+8ju5yHvuXuqXaMbqktcB9ZLacVQ2rW6l4LSm9KK8dpLdQOzPzfx86nVG8C6z9Lmi4LruKas8b3ruY1b1HHAoq6h4voSdu5/zRbtEfvbGfi0RKLZv0ttFD5ba8bjI0mSPMuaOQL8TGvLo40B+HnSplTbhsRx/J0Ej9E0yarPsNKc4peb3sFKNVvEz0thsuxTubGcJNXo1WIZt3Ed9zouSWkGhR8f31+5McZi0noGY39LUlJGMPbXmtoy4nnHETU/EjapueiHjL8eweOmt+6fls/RFuvi8HHshRtLczwu2KJtib8RNM/xXtUjq2Y6hgX82DL13vNI+OuRuIwXjl+vGcZZL5lz4XejxbBTbdsxknVOxzAmCfj2+s2l5yYpm5E1eyR9M7YZXTMmF7e1/pZCWsZU3C7xtyRr3J6QtGPKbmTN/jtirh2H9h5/vxtZcy/+5mCN2xPUtxE/lr4g8jcCfz3BlZFaK3XuaB23yGZ0zTduqvPQP4e6vUG2KX89kdPs9VLfw/wc1QbZpvz1BFdGr4n6rukyNqNp9vGp5r99I373PMX+mVoXgNd5ptZ9StctLE1ujhyPR7lxZu63PcHNz4c51TC38c5NdRmOQ51yc+st59EtiO/FveB4ZOJn9K7geERw3NUejwiO41eK4xE1U2vWNannda0cNevZRq3rU9SsWUvXw9o2zM71t454bo5Rs2Td8mgxNIck3owWT3KcomZJjB197L+ysrJyTPwFfY1jaw==
   </data>
  </layer>
  <objectgroup id="5" name="special">
@@ -382,18 +382,9 @@
     <property name="type" value="text_display"/>
    </properties>
   </object>
-  <object id="196" gid="30" x="1408" y="4032" width="128" height="128">
+  <object id="196" gid="30" x="1600" y="3840" width="192" height="192">
    <properties>
-    <property name="color" value="0.128.0.255"/>
-    <property name="draw_screen" type="bool" value="false"/>
-    <property name="font_size" type="int" value="30"/>
-    <property name="text" value=""/>
-    <property name="type" value="text_display"/>
-   </properties>
-  </object>
-  <object id="197" gid="30" x="2304" y="4032" width="128" height="128">
-   <properties>
-    <property name="color" value="0.128.0.255"/>
+    <property name="color" value="0.225.255.255"/>
     <property name="draw_screen" type="bool" value="false"/>
     <property name="font_size" type="int" value="30"/>
     <property name="text" value=""/>
@@ -414,6 +405,15 @@
     <property name="id" type="int" value="1"/>
     <property name="send_to" type="int" value="-1"/>
     <property name="type" value="teleporter"/>
+   </properties>
+  </object>
+  <object id="214" gid="30" x="2048" y="3840" width="192" height="192">
+   <properties>
+    <property name="color" value="0.225.255.255"/>
+    <property name="draw_screen" type="bool" value="false"/>
+    <property name="font_size" type="int" value="30"/>
+    <property name="text" value=""/>
+    <property name="type" value="text_display"/>
    </properties>
   </object>
  </objectgroup>
@@ -495,7 +495,7 @@
   <object id="128" gid="100" x="2240" y="1216" width="64" height="448"/>
   <object id="129" gid="100" x="1728" y="1024" width="64" height="64"/>
   <object id="130" gid="100" x="1600" y="1152" width="64" height="64"/>
-  <object id="131" gid="100" x="704" y="512" width="704" height="64"/>
+  <object id="131" gid="100" x="768" y="512" width="640" height="64"/>
   <object id="132" gid="100" x="448" y="512" width="64" height="64"/>
   <object id="133" gid="100" x="512" y="448" width="64" height="64"/>
   <object id="134" gid="100" x="576" y="384" width="64" height="64"/>
